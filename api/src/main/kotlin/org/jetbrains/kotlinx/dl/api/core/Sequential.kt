@@ -134,7 +134,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         var inputShape: Shape = inputLayer.computeOutputShape()
 
         layers.filter { it !is Input }.forEach {
-            it.build(tf, kGraph, inputShape)
+            it.build(tf, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
             val tensorShape = TensorShape(inputShape)

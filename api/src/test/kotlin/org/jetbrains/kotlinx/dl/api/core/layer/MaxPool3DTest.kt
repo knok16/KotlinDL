@@ -1,13 +1,11 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool3D
 import org.jetbrains.kotlinx.dl.api.core.loss.EPS
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
-import org.tensorflow.Graph
 import org.tensorflow.op.Ops
 import org.tensorflow.Shape
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -73,7 +71,7 @@ internal class MaxPool3DTest {
         )
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, KGraph(Graph().toGraphDef()), inputShape)
+            layer.build(tf, inputShape)
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numOfLosses = tf.constant(1.0f)

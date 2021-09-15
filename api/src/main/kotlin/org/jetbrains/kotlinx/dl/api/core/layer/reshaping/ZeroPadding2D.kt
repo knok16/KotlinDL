@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_FIRST
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.tensorflow.Shape
@@ -77,7 +76,7 @@ public class ZeroPadding2D : AbstractZeroPadding {
         this.dataFormat = dataFormat ?: CHANNELS_LAST
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         this.inputShape = inputShape
     }
 

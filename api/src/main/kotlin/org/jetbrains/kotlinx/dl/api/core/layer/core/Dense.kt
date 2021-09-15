@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.core
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
@@ -64,7 +62,7 @@ public class Dense(
     private lateinit var kernel: VariableDto
     private var bias: VariableDto? = null
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 

@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
@@ -80,7 +79,7 @@ public class ZeroPadding3D : AbstractZeroPadding {
         this.padding = padding
     }
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         this.inputShape = inputShape
     }
 

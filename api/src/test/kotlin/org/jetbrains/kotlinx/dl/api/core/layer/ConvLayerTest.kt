@@ -8,7 +8,6 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.EPS
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.AbstractConv
-import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv1D
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -116,7 +115,7 @@ open class ConvLayerTest {
                     val isTraining = tf.constant(true)
                     val numberOfLosses = tf.constant(1.0f)
 
-                    layer.build(tf, kGraph, input.shape)
+                    layer.build(tf, input.shape)
                     val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
 
                     layer.initialize(session)

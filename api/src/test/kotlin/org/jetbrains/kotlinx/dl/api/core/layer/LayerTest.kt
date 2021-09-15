@@ -1,6 +1,5 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.junit.jupiter.api.Assertions
 import org.tensorflow.*
@@ -28,10 +27,9 @@ open class LayerTest {
         tf: Ops,
         layer: Layer,
         input: Array<*>,
-        kGraph: KGraph,
     ): Output<*> {
         val inputShape = input.shape
-        layer.build(tf, kGraph, inputShape)
+        layer.build(tf, inputShape)
         val inputOp = getInputOp(tf, input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
@@ -45,8 +43,7 @@ open class LayerTest {
     ): Tensor<*> {
         EagerSession.create().use {
             val tf = Ops.create()
-            val kGraph = KGraph(Graph().toGraphDef())
-            val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
+            val outputOp = getLayerOutputOp(tf, layer, input)
             return outputOp.tensor()
         }
     }
@@ -58,13 +55,11 @@ open class LayerTest {
         Graph().use { graph ->
             Session(graph).use { session ->
                 val tf = Ops.create(graph)
-                KGraph(graph.toGraphDef()).use { kGraph ->
-                    val outputOp = getLayerOutputOp(tf, layer, input, kGraph)
+                val outputOp = getLayerOutputOp(tf, layer, input)
 
-                    if (layer is ParametrizedLayer) layer.initialize(session)
+                if (layer is ParametrizedLayer) layer.initialize(session)
 
-                    return session.runner().fetch(outputOp).run().first()
-                }
+                return session.runner().fetch(outputOp).run().first()
             }
         }
     }

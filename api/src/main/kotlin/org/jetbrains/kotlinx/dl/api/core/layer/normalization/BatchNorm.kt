@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.normalization
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
@@ -62,7 +61,7 @@ public class BatchNorm(
     private lateinit var movingMean: VariableDto
     private lateinit var movingVariance: VariableDto
 
-    override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
+    override fun build(tf: Ops, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
         val weightShape = Shape.make(inputShape.size(axis[0]))
 

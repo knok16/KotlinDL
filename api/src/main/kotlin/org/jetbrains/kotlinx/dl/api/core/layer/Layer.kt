@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer
 
-import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
@@ -41,10 +40,9 @@ public abstract class Layer(public var name: String) {
      * Extend this function to define variables in layer.
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [kGraph] [KGraph] to update it.
      * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
      */
-    public abstract fun build(tf: Ops, kGraph: KGraph, inputShape: Shape)
+    public abstract fun build(tf: Ops, inputShape: Shape)
 
 
     /**
@@ -54,11 +52,10 @@ public abstract class Layer(public var name: String) {
      * NOTE: Used in Functional API
      *
      * @param [tf] TensorFlow graph API for building operations.
-     * @param [kGraph] [KGraph] to update it.
      */
-    public fun buildFromInboundLayers(tf: Ops, kGraph: KGraph) {
+    public fun buildFromInboundLayers(tf: Ops) {
         require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        build(tf, kGraph, inboundLayers[0].outputShape.toShape())
+        build(tf, inboundLayers[0].outputShape.toShape())
     }
 
     /**
