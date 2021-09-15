@@ -6,7 +6,10 @@
 package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
@@ -342,7 +345,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         val layerDescriptions = mutableListOf<String>()
 
         for (l in layers) {
-            if (l.isTrainable) totalTrainableParams += l.paramCount else totalFrozenParams += l.paramCount
+            if (l is ParametrizedLayer)
+                if (l is TrainableLayer && l.isTrainable) totalTrainableParams += l.paramCount
+                else totalFrozenParams += l.paramCount
             val inboundLayerNames = l.inboundLayers.map { it.name }.toTypedArray()
 
             if (inboundLayerNames.isNotEmpty()) {
