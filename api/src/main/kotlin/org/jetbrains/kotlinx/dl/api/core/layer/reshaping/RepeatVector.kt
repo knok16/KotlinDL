@@ -52,10 +52,6 @@ public class RepeatVector(
         return tf.tile(x, pattern)
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 
     override fun toString(): String {

@@ -33,9 +33,6 @@ public class AvgPool3D(
 
     override val hasActivation: Boolean
         get() = false
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
 
     init {
         requireArraySize(poolSize, 5, "poolSize")

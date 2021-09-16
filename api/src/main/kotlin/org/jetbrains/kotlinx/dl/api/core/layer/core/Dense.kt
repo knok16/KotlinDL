@@ -96,12 +96,6 @@ public class Dense(
         return Activations.convert(activation).apply(tf, signal, name)
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractDenseWeights()
-        set(value) = assignWeights(value)
-
-    private fun extractDenseWeights(): Map<String, Array<*>> = extractWeights(variables.map { it.name })
-
     override val hasActivation: Boolean get() = true
 
     /** Returns the shape of kernel weights. */
