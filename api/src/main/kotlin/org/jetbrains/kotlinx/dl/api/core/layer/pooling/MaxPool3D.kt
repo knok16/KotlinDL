@@ -54,8 +54,6 @@ public class MaxPool3D(
         return tf.nn.maxPool3d(tfInput, tfPoolSize.toList(), tfStrides.toList(), paddingName)
     }
 
-    override val hasActivation: Boolean get() = false
-
     override fun toString(): String {
         return "MaxPool3D(poolSize=${poolSize.contentToString()}, strides=${strides.contentToString()}, padding=$padding)"
     }

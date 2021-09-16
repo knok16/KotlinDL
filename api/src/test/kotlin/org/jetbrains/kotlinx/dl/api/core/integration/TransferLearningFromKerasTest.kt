@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.LayerWithActivation
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -129,14 +130,14 @@ class TransferLearningTest : IntegrationTest() {
 
         assertEquals(testModel.layers.size, 9)
         assertFalse(testModel.getLayer(flattenLayerName).isTrainable)
-        assertFalse(testModel.getLayer(flattenLayerName).hasActivation)
+        assertFalse(testModel.getLayer(flattenLayerName) is LayerWithActivation)
         assertTrue(testModel.getLayer(conv2dLayerName) is Conv2D)
         assertTrue((testModel.getLayer(conv2dLayerName) as Conv2D).kernelInitializer is GlorotNormal)
         assertTrue((testModel.getLayer(conv2dLayerName) as Conv2D).biasInitializer is GlorotUniform)
         assertTrue((testModel.getLayer(conv2dLayerName) as Conv2D).padding == ConvPadding.SAME)
         assertTrue((testModel.getLayer(conv2dLayerName) as Conv2D).activation == Activations.Relu)
         assertTrue(testModel.getLayer(conv2dLayerName).isTrainable)
-        assertTrue(testModel.getLayer(conv2dLayerName).hasActivation)
+        assertTrue(testModel.getLayer(conv2dLayerName) is LayerWithActivation)
         assertTrue((testModel.getLayer(conv2d1LayerName) as Conv2D).kernelInitializer is HeNormal)
         assertTrue((testModel.getLayer(conv2d1LayerName) as Conv2D).biasInitializer is HeUniform)
         assertTrue((testModel.getLayer(conv2d1LayerName) as Conv2D).padding == ConvPadding.SAME)

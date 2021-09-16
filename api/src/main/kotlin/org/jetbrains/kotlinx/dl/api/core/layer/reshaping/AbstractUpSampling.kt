@@ -24,9 +24,6 @@ public abstract class AbstractUpSampling(
     name: String,
 ) : Layer(name) {
 
-    override val hasActivation: Boolean
-        get() = false
-
     override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun forward(

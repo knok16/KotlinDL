@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.exception.RepeatableLayerNameException
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
+import org.jetbrains.kotlinx.dl.api.core.layer.LayerWithActivation
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -94,9 +95,9 @@ internal class SequentialModelTest {
         assertTrue(correctTestModel.getLayer("conv2d_1") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_2") is Conv2D)
         assertTrue(correctTestModel.getLayer("conv2d_1").isTrainable)
-        assertTrue(correctTestModel.getLayer("conv2d_1").hasActivation)
+        assertTrue(correctTestModel.getLayer("conv2d_1") is LayerWithActivation)
         assertFalse(correctTestModel.getLayer("flatten_1").isTrainable)
-        assertFalse(correctTestModel.getLayer("flatten_1").hasActivation)
+        assertFalse(correctTestModel.getLayer("flatten_1") is LayerWithActivation)
         assertArrayEquals(correctTestModel.inputLayer.packedDims, longArrayOf(IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS))
     }
 

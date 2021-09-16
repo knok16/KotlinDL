@@ -100,9 +100,6 @@ public abstract class Layer(public var name: String) {
         inboundLayers = layers.toMutableList()
         return this
     }
-
-    /** Returns True, if layer has internal activation function. */
-    public abstract val hasActivation: Boolean
 }
 
 internal fun requireArraySize(array: LongArray, size: Int, name: String) =

@@ -61,7 +61,7 @@ public abstract class AbstractConv(
     protected val defaultKernelVariableName: String,
     protected val defaultBiasVariableName: String,
     name: String
-) : Layer(name), ParametrizedLayer {
+) : Layer(name), ParametrizedLayer, LayerWithActivation {
     public override val variables: List<VariableDto>
         get() = listOfNotNull(kernel, bias)
 
@@ -125,8 +125,6 @@ public abstract class AbstractConv(
 
         return Activations.convert(activationInternal).apply(tf, withBias, name)
     }
-
-    override val hasActivation: Boolean get() = true
 
     /** Define the number of output channels given the number of input channels.
      *  Defaults to the number of filter in convolutional layer. */

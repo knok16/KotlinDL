@@ -32,9 +32,6 @@ public class AvgPool1D(
     name: String = ""
 ) : Layer(name) {
 
-    override val hasActivation: Boolean
-        get() = false
-
     init {
         requireArraySize(poolSize, 3, "poolSize")
         requireArraySize(strides, 3, "strides")

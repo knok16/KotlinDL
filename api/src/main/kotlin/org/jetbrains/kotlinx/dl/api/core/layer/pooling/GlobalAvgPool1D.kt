@@ -40,8 +40,6 @@ public class GlobalAvgPool1D(
         return TF.mean(tf, input, tf.constant(stepAxis))
     }
 
-    override val hasActivation: Boolean get() = false
-
     override fun toString(): String {
         return "GlobalAvgPool1D(name=$name)"
     }

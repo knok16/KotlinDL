@@ -10,7 +10,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormBetaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormGammaVarName
 import org.jetbrains.kotlinx.dl.api.core.util.batchNormMovingMeanVarName
@@ -136,8 +135,6 @@ public class BatchNorm(
         return if (center) tf.math.add(xNorm, beta)
         else xNorm
     }
-
-    override val hasActivation: Boolean get() = false
 
     override fun toString(): String {
         return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"

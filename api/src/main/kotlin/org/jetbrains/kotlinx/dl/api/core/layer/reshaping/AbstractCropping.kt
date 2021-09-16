@@ -20,8 +20,6 @@ public abstract class AbstractCropping(
     public val croppingInternal: Array<IntArray>,
     name: String,
 ) : Layer(name) {
-    override val hasActivation: Boolean
-        get() = false
 
     override fun build(tf: Ops, inputShape: Shape) {}
 

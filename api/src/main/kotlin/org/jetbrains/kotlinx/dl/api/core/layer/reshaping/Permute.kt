@@ -52,8 +52,6 @@ public class Permute(
         return tf.linalg.transpose(input, perm)
     }
 
-    override val hasActivation: Boolean get() = false
-
     override fun toString(): String {
         return "Permute(name=$name, dims=$dims)"
     }

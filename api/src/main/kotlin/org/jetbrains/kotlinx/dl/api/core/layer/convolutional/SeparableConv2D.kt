@@ -78,7 +78,7 @@ public class SeparableConv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     name: String = ""
-) : Layer(name), NoGradients, ParametrizedLayer {
+) : Layer(name), NoGradients, ParametrizedLayer, LayerWithActivation {
     override val variables: List<VariableDto>
         get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias)
 
@@ -193,8 +193,6 @@ public class SeparableConv2D(
 
         return Activations.convert(activation).apply(tf, output, name)
     }
-
-    override val hasActivation: Boolean get() = true
 
     override fun toString(): String =
         "SeparableConv2D(kernelSize=${kernelSize.contentToString()}, strides=${strides.contentToString()}, " +

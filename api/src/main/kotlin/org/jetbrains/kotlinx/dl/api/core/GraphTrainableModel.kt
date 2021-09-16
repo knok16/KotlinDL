@@ -704,7 +704,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
 
         if (visualizationIsEnabled) {
             for (layer in layers) {
-                if (layer.hasActivation && layer != layers.last()) runner.fetch(defaultActivationName(layer))
+                if (layer is LayerWithActivation && layer != layers.last()) runner.fetch(defaultActivationName(layer))
             }
         }
         return runner.run()

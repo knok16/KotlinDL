@@ -84,7 +84,4 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
             ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
         }
     }
-
-    override val hasActivation: Boolean
-        get() = false
 }

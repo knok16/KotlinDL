@@ -54,7 +54,7 @@ public class Dense(
     public val useBias: Boolean = true,
     name: String = "",
     override var isTrainable: Boolean = true
-) : Layer(name), ParametrizedLayer, TrainableLayer {
+) : Layer(name), ParametrizedLayer, TrainableLayer, LayerWithActivation {
     override val variables: List<VariableDto>
         get() = listOfNotNull(kernel, bias)
 
@@ -95,8 +95,6 @@ public class Dense(
         val signal = bias?.let { tf.math.add(matMul, it.variable) } ?: matMul
         return Activations.convert(activation).apply(tf, signal, name)
     }
-
-    override val hasActivation: Boolean get() = true
 
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer)"

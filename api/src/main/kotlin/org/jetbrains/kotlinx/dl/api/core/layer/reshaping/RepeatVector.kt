@@ -52,8 +52,6 @@ public class RepeatVector(
         return tf.tile(x, pattern)
     }
 
-    override val hasActivation: Boolean get() = false
-
     override fun toString(): String {
         return "RepeatVector"
     }

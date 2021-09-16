@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.LayerWithActivation
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -22,7 +23,7 @@ import org.tensorflow.op.Ops
  *
  * @param [name] Layer name. Would be changed if empty during model compilation.
  */
-public abstract class AbstractActivationLayer(name: String) : Layer(name) {
+public abstract class AbstractActivationLayer(name: String) : Layer(name), LayerWithActivation {
     /**
      * Applies the activation functions to the [input] to produce the output.
      *
@@ -47,6 +48,4 @@ public abstract class AbstractActivationLayer(name: String) : Layer(name) {
         this.outputShape = TensorShape(inputShape)
         return inputShape
     }
-
-    override val hasActivation: Boolean get() = true
 }

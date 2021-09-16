@@ -15,7 +15,6 @@ import org.tensorflow.op.Ops
 public abstract class AbstractZeroPadding(
     name: String
 ) : Layer(name) {
-    override val hasActivation: Boolean get() = false
 
     override fun forward(
         tf: Ops,

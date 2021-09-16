@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
+import org.jetbrains.kotlinx.dl.api.core.layer.LayerWithActivation
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
@@ -145,9 +146,9 @@ class SequentialInferenceTest {
             assertTrue(model.getLayer("conv2d_1") is Conv2D)
             assertTrue(model.getLayer("conv2d_3") is Conv2D)
             assertTrue(model.getLayer("conv2d_1").isTrainable)
-            assertTrue(model.getLayer("conv2d_1").hasActivation)
+            assertTrue(model.getLayer("conv2d_1") is LayerWithActivation)
             assertFalse(model.getLayer("flatten_5").isTrainable)
-            assertFalse(model.getLayer("flatten_5").hasActivation)
+            assertFalse(model.getLayer("flatten_5") is LayerWithActivation)
             assertTrue(model.getLayer("maxPool_2") is MaxPool2D)
             assertTrue(model.getLayer("maxPool_4") is MaxPool2D)
             assertTrue(model.getLayer("dense_6") is Dense)

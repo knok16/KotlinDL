@@ -73,6 +73,4 @@ public class AvgPool2D(
             paddingName
         )
     }
-
-    override val hasActivation: Boolean get() = false
 }
