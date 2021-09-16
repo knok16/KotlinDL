@@ -66,10 +66,10 @@ public abstract class AbstractConv(
         get() = listOfNotNull(kernel, bias)
 
     /** Tensor with kernel weights */
-    protected lateinit var kernel: VariableDto
+    public lateinit var kernel: VariableDto
 
     /** Tensor with bias weights */
-    protected var bias: VariableDto? = null
+    public var bias: VariableDto? = null
 
     override fun build(tf: Ops, inputShape: Shape) {
         // Amount of channels should be the last value in the inputShape
@@ -125,12 +125,6 @@ public abstract class AbstractConv(
 
         return Activations.convert(activationInternal).apply(tf, withBias, name)
     }
-
-    /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override val hasActivation: Boolean get() = true
 

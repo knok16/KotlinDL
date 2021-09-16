@@ -56,10 +56,10 @@ public class BatchNorm(
     override val variables: List<VariableDto>
         get() = listOfNotNull(gamma, beta, movingMean, movingVariance)
 
-    private var gamma: VariableDto? = null
-    private var beta: VariableDto? = null
-    private lateinit var movingMean: VariableDto
-    private lateinit var movingVariance: VariableDto
+    public var gamma: VariableDto? = null
+    public var beta: VariableDto? = null
+    public lateinit var movingMean: VariableDto
+    public lateinit var movingVariance: VariableDto
 
     override fun build(tf: Ops, inputShape: Shape) {
         // Compute shapes of kernel and bias matrices
@@ -138,22 +138,6 @@ public class BatchNorm(
     }
 
     override val hasActivation: Boolean get() = false
-
-    /** Returns the shape of gamma variable weights. */
-    public val gammaShapeArray: LongArray?
-        get() = gamma?.let { TensorShape(it.shape).dims() }
-
-    /** Returns the shape of beta variable weights. */
-    public val betaShapeArray: LongArray?
-        get() = beta?.let { TensorShape(it.shape).dims() }
-
-    /** Returns the shape of movingMean variable weights. */
-    public val movingMeanShapeArray: LongArray
-        get() = TensorShape(movingMean.shape).dims()
-
-    /** Returns the shape of movingVariance variable weights. */
-    public val movingVarianceShapeArray: LongArray
-        get() = TensorShape(movingVariance.shape).dims()
 
     override fun toString(): String {
         return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"

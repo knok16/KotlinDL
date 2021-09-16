@@ -83,9 +83,9 @@ public class SeparableConv2D(
         get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias)
 
     // weight tensors
-    private lateinit var depthwiseKernel: VariableDto
-    private lateinit var pointwiseKernel: VariableDto
-    private var bias: VariableDto? = null
+    public lateinit var depthwiseKernel: VariableDto
+    public lateinit var pointwiseKernel: VariableDto
+    public var bias: VariableDto? = null
 
     init {
         requireArraySize(kernelSize, 2, "kernelSize")
@@ -193,15 +193,6 @@ public class SeparableConv2D(
 
         return Activations.convert(activation).apply(tf, output, name)
     }
-
-    /** Returns the shape of kernel weights. */
-    public val depthwiseShapeArray: LongArray get() = TensorShape(depthwiseKernel.shape).dims()
-
-    /** Returns the shape of kernel weights. */
-    public val pointwiseShapeArray: LongArray get() = TensorShape(pointwiseKernel.shape).dims()
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override val hasActivation: Boolean get() = true
 

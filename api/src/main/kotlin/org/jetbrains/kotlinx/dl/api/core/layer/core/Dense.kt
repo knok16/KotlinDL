@@ -59,8 +59,8 @@ public class Dense(
         get() = listOfNotNull(kernel, bias)
 
     // weight tensors with additional information
-    private lateinit var kernel: VariableDto
-    private var bias: VariableDto? = null
+    public lateinit var kernel: VariableDto
+    public var bias: VariableDto? = null
 
     override fun build(tf: Ops, inputShape: Shape) {
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
@@ -97,12 +97,6 @@ public class Dense(
     }
 
     override val hasActivation: Boolean get() = true
-
-    /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernel.shape).dims()
-
-    /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer)"
