@@ -16,6 +16,7 @@ import org.tensorflow.op.Ops
  * @property [padding] 4 numbers  interpreted as `(top_pad, bottom_pad, left_pad, right_pad)`.
  */
 public class ZeroPadding2D : AbstractZeroPadding {
+    override var name: String
     public val padding: IntArray
     private val dataFormat: String
     private lateinit var inputShape: Shape
@@ -70,10 +71,11 @@ public class ZeroPadding2D : AbstractZeroPadding {
      * input to this layer
      * @param [name] layer name
      */
-    public constructor(padding: IntArray, dataFormat: String?, name: String = "") : super(name) {
+    public constructor(padding: IntArray, dataFormat: String?, name: String = "") {
         require(padding.size == 4)
         this.padding = padding
         this.dataFormat = dataFormat ?: CHANNELS_LAST
+        this.name = name
     }
 
     override fun build(tf: Ops, inputShape: Shape) {

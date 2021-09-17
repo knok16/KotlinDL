@@ -28,8 +28,8 @@ public class MaxPool2D(
     public val poolSize: IntArray = intArrayOf(1, 2, 2, 1),
     public val strides: IntArray = intArrayOf(1, 2, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
     override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {

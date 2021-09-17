@@ -29,8 +29,8 @@ import org.tensorflow.op.Ops
 public class Dropout(
     private val keepProbability: Float = 0.1f,
     private val seed: Long = 12L,
-    name: String = ""
-) : Layer(name), NoGradients {
+    override var name: String = ""
+) : Layer(), NoGradients {
     override fun build(tf: Ops, inputShape: Shape) {
     }
 

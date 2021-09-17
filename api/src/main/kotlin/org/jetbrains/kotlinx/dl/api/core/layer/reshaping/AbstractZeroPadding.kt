@@ -12,9 +12,7 @@ import org.tensorflow.op.Ops
 /**
  * Abstract Zero Padding layer used as the base layer for all the ZeroPadding layers.
  */
-public abstract class AbstractZeroPadding(
-    name: String
-) : Layer(name) {
+public abstract class AbstractZeroPadding : Layer() {
 
     override fun forward(
         tf: Ops,

@@ -18,7 +18,7 @@ import org.tensorflow.op.Ops
  *
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
-public abstract class AbstractMerge(public val layerTypeName: String, name: String = "") : Layer(name) {
+public abstract class AbstractMerge(public val layerTypeName: String) : Layer() {
     override fun build(tf: Ops, inputShape: Shape) {
 
     }

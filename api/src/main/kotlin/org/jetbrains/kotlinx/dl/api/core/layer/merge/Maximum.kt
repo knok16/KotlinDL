@@ -13,7 +13,7 @@ import org.tensorflow.op.Ops
  *
  * It takes as input a list of tensors, all the same shape, and returns a single tensor (also of the same shape).
  */
-public class Maximum(name: String = "") : AbstractMerge("MaximumLayer", name) {
+public class Maximum(override var name: String = "") : AbstractMerge("MaximumLayer") {
     override fun mergeFunction(
         input: List<Operand<Float>>,
         tf: Ops

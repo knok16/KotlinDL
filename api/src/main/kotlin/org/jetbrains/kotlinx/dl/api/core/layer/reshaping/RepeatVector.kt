@@ -25,8 +25,8 @@ import org.tensorflow.op.Ops
  */
 public class RepeatVector(
     public val n: Int,
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
 
     init {
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }

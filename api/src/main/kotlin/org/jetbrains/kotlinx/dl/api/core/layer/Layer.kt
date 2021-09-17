@@ -13,10 +13,13 @@ import org.tensorflow.op.Ops
 
 /**
  * Base abstract class for all layers.
- *
- * @param [name] Layer name. Would be changed if empty during model compilation.
  */
-public abstract class Layer(public var name: String) {
+public abstract class Layer {
+    /**
+     * Layer name. Would be changed if empty during model compilation.
+     */
+    public abstract var name: String
+
     /** Output data tensor shape. */
     public lateinit var outputShape: TensorShape
 

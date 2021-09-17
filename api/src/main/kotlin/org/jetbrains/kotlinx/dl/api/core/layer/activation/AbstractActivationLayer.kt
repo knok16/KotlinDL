@@ -20,10 +20,8 @@ import org.tensorflow.op.Ops
  *
  * By default, it defines returning the output with the same shape
  * as the input Operand.
- *
- * @param [name] Layer name. Would be changed if empty during model compilation.
  */
-public abstract class AbstractActivationLayer(name: String) : Layer(name), LayerWithActivation {
+public abstract class AbstractActivationLayer : Layer(), LayerWithActivation {
     /**
      * Applies the activation functions to the [input] to produce the output.
      *

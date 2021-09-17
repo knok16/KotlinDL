@@ -14,6 +14,7 @@ import org.tensorflow.op.Ops
  * @property [padding] 6 numbers  interpreted as `(left_dim1_pad, right_dim1_pad, left_dim2_pad, right_dim2_pad, left_dim3_pad, right_dim3_pad)`.
  */
 public class ZeroPadding3D : AbstractZeroPadding {
+    override var name: String = ""
     public val padding: IntArray
     private lateinit var inputShape: Shape
 
@@ -74,9 +75,10 @@ public class ZeroPadding3D : AbstractZeroPadding {
      * padding[5] -> back padding
      * @param [name] layer name
      */
-    public constructor(padding: IntArray, name: String = "") : super(name) {
+    public constructor(padding: IntArray, name: String = "") {
         require(padding.size == 6)
         this.padding = padding
+        this.name = name
     }
 
     override fun build(tf: Ops, inputShape: Shape) {

@@ -16,8 +16,8 @@ import org.tensorflow.op.Ops
  * Downsamples the input by taking the maximum value over spatio-temporal dimensions.
  */
 public class GlobalMaxPool3D(
-    name: String = "",
-) : Layer(name) {
+    override var name: String = "",
+) : Layer() {
 
     override fun build(tf: Ops, inputShape: Shape) {}
 

@@ -14,7 +14,7 @@ import org.tensorflow.op.Ops
  * It takes as input a list of tensors, all the same shape, and returns a single tensor (also of the same shape),
  * (```inputs[i-1] - inputs[i]```), also of the same shape.
  */
-public class Subtract(name: String = "") : AbstractMerge("SubtractLayer", name) {
+public class Subtract(override var name: String = "") : AbstractMerge("SubtractLayer") {
     override fun mergeFunction(
         input: List<Operand<Float>>,
         tf: Ops

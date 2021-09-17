@@ -20,8 +20,8 @@ import org.tensorflow.op.Ops
  */
 public class Concatenate(
     public var axis: Int = 3,
-    name: String = ""
-) : AbstractMerge("ConcatenateLayer", name), NoGradients {
+    override var name: String = ""
+) : AbstractMerge("ConcatenateLayer"), NoGradients {
     override fun computeOutputShapeFromInboundLayers(): TensorShape {
         val inputShapes = mutableListOf<TensorShape>()
         inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }

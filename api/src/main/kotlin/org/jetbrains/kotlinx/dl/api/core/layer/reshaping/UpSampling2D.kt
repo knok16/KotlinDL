@@ -27,11 +27,10 @@ import org.tensorflow.op.image.ResizeBilinear
 public class UpSampling2D(
     public val size: IntArray = intArrayOf(2, 2),
     public val interpolation: InterpolationMethod = InterpolationMethod.NEAREST,
-    name: String = "",
+    override var name: String = ""
 ) : AbstractUpSampling(
     sizeInternal = size,
     interpolationInternal = interpolation,
-    name = name,
 ) {
     init {
         require(size.size == 2) {

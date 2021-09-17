@@ -13,7 +13,7 @@ import org.tensorflow.op.Ops
  *
  * It takes as input a list of tensors, all the same shape, and returns a single tensor (also of the same shape).
  */
-public class Minimum(name: String = "") : AbstractMerge("MinimumLayer", name) {
+public class Minimum(override var name: String = "") : AbstractMerge("MinimumLayer") {
     override fun mergeFunction(
         input: List<Operand<Float>>,
         tf: Ops

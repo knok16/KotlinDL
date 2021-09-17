@@ -22,8 +22,8 @@ public class MaxPool3D(
     public var poolSize: IntArray = intArrayOf(1, 2, 2, 2, 1),
     public var strides: IntArray = intArrayOf(1, 2, 2, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
 
     override fun build(tf: Ops, inputShape: Shape) {}
 

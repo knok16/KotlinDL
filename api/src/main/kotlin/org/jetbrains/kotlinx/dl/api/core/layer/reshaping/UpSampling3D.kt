@@ -23,11 +23,10 @@ import org.tensorflow.op.Ops
  */
 public class UpSampling3D(
     public val size: IntArray = intArrayOf(2, 2, 2),
-    name: String = "",
+    override var name: String = ""
 ) : AbstractUpSampling(
     sizeInternal = size,
     interpolationInternal = InterpolationMethod.NEAREST,
-    name = name,
 ) {
     init {
         require(size.size == 3) {

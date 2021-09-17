@@ -21,8 +21,8 @@ import org.tensorflow.op.Ops
  */
 public class Permute(
     public val dims: IntArray,
-    name: String
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
 
     init {
         require(dims.sorted() == (1..dims.size).toList()) {

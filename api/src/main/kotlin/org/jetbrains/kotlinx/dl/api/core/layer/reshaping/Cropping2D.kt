@@ -23,10 +23,9 @@ import org.tensorflow.op.Ops
  */
 public class Cropping2D(
     public val cropping: Array<IntArray>,
-    name: String = "",
+    override var name: String = "",
 ) : AbstractCropping(
     croppingInternal = cropping,
-    name = name,
 ) {
     init {
         require(cropping.size == 2) {

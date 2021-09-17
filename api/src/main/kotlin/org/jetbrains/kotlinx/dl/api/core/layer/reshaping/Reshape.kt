@@ -28,8 +28,8 @@ import kotlin.math.abs
  */
 public class Reshape(
     public val targetShape: List<Int>,
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
     private lateinit var units: Constant<Int>
 
     override fun build(tf: Ops, inputShape: Shape) {

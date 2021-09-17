@@ -29,8 +29,8 @@ public class ReLU(
     public val maxValue: Float? = null,
     public val negativeSlope: Float = 0.0f,
     public val threshold: Float = 0.0f,
-    name: String = ""
-) : AbstractActivationLayer(name) {
+    override var name: String = ""
+) : AbstractActivationLayer() {
     init {
         require(negativeSlope >= 0.0f) { "Negative slope $negativeSlope should be >= 0.0." }
         require(maxValue == null || maxValue >= 0.0f) { "Max value $maxValue should be >= 0.0." }

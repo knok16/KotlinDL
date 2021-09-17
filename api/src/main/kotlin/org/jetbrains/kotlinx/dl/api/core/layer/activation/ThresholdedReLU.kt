@@ -23,8 +23,8 @@ import org.tensorflow.op.Ops
  */
 public class ThresholdedReLU(
     public val theta: Float = 1.0f,
-    name: String = ""
-) : AbstractActivationLayer(name) {
+    override var name: String = ""
+) : AbstractActivationLayer() {
 
     init {
         require(theta >= 0.0f) { "Theta $theta should be >= 0.0." }

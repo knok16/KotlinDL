@@ -22,7 +22,7 @@ import org.tensorflow.op.core.Placeholder
  * @property [name] Custom layer name.
  * @constructor Creates [Input] layer from [packedDims] representing [input] data shape.
  */
-public class Input(vararg dims: Long, name: String = "") : Layer(name) {
+public class Input(vararg dims: Long, override var name: String = "") : Layer() {
     /** Placeholder for input data. */
     public lateinit var input: Placeholder<Float>
 

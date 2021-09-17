@@ -20,9 +20,8 @@ import org.tensorflow.op.Ops
  */
 public abstract class AbstractUpSampling(
     public val sizeInternal: IntArray,
-    public val interpolationInternal: InterpolationMethod,
-    name: String,
-) : Layer(name) {
+    public val interpolationInternal: InterpolationMethod
+) : Layer() {
 
     override fun build(tf: Ops, inputShape: Shape) {}
 

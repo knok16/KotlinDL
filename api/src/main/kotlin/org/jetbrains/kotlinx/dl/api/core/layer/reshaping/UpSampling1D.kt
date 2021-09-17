@@ -22,11 +22,10 @@ import org.tensorflow.op.Ops
  */
 public class UpSampling1D(
     public val size: Int = 2,
-    name: String = "",
+    override var name: String = ""
 ) : AbstractUpSampling(
     sizeInternal = intArrayOf(size),
     interpolationInternal = InterpolationMethod.NEAREST,
-    name = name,
 ) {
     init {
         require(size > 0) {

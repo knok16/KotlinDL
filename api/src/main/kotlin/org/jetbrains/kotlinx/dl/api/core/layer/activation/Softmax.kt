@@ -23,8 +23,8 @@ import org.tensorflow.op.core.ReduceMax
  */
 public class Softmax(
     public val axis: List<Int> = listOf(-1),
-    name: String = ""
-) : AbstractActivationLayer(name) {
+    override var name: String = ""
+) : AbstractActivationLayer() {
     init {
         if (axis.size != 1) throw Exception("Multiple axes are not supported")
     }

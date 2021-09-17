@@ -28,8 +28,8 @@ import org.tensorflow.op.Ops
  */
 public class ELU(
     public val alpha: Float = 1.0f,
-    name: String = ""
-) : AbstractActivationLayer(name) {
+    override var name: String = ""
+) : AbstractActivationLayer() {
     init {
         require(alpha > 0.0f) { "Alpha $alpha should be > 0.0." }
     }

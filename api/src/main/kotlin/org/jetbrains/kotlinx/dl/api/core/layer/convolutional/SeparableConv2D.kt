@@ -77,8 +77,8 @@ public class SeparableConv2D(
     public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
-    name: String = ""
-) : Layer(name), NoGradients, ParametrizedLayer, LayerWithActivation {
+    override var name: String = ""
+) : Layer(), NoGradients, ParametrizedLayer, LayerWithActivation {
     override val variables: List<VariableDto>
         get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias)
 

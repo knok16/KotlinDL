@@ -63,7 +63,7 @@ public class DepthwiseConv2D(
     public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
-    name: String = ""
+    override var name: String = ""
 ) : AbstractConv(
     // filtersInternal is not used in any place of this implementation of AbstractConv because
     // all its usages are overridden with custom functions that use the depthMultiplier and the
@@ -81,8 +81,7 @@ public class DepthwiseConv2D(
     paddingInternal = padding,
     useBiasInternal = useBias,
     defaultKernelVariableName = KERNEL_VARIABLE_NAME,
-    defaultBiasVariableName = BIAS_VARIABLE_NAME,
-    name = name
+    defaultBiasVariableName = BIAS_VARIABLE_NAME
 ), NoGradients {
 
     init {

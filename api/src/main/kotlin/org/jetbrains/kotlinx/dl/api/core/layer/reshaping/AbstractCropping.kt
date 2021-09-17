@@ -17,9 +17,8 @@ import org.tensorflow.op.Ops
  * of this abstract class and each subclassed layer uses its own copy of the cropping size values.
  */
 public abstract class AbstractCropping(
-    public val croppingInternal: Array<IntArray>,
-    name: String,
-) : Layer(name) {
+    public val croppingInternal: Array<IntArray>
+) : Layer() {
 
     override fun build(tf: Ops, inputShape: Shape) {}
 

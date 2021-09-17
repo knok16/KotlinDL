@@ -35,9 +35,9 @@ public class PReLU(
     public val alphaInitializer: Initializer = Zeros(),
     public val alphaRegularizer: Regularizer? = null,
     public val sharedAxes: IntArray? = null,
-    name: String = "",
+    override var name: String = "",
     override var isTrainable: Boolean = true
-) : AbstractActivationLayer(name), ParametrizedLayer, TrainableLayer {
+) : AbstractActivationLayer(), ParametrizedLayer, TrainableLayer {
     /**
      * TODO: support for constraint (alphaConstraint) should be added
      */

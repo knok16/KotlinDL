@@ -26,8 +26,8 @@ import org.tensorflow.op.Ops
  * @since 0.2
  */
 public class GlobalAvgPool2D(
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
     override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {

@@ -13,7 +13,7 @@ import org.tensorflow.op.Ops
  *
  * It takes as input a list of tensors, all the same shape, and returns a single tensor (also of the same shape).
  */
-public class Multiply(name: String = "") : AbstractMerge("MultiplyLayer", name) {
+public class Multiply(override var name: String = "") : AbstractMerge("MultiplyLayer") {
     override fun mergeFunction(
         input: List<Operand<Float>>,
         tf: Ops

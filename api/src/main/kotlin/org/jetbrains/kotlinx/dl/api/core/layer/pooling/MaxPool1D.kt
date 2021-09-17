@@ -29,8 +29,8 @@ public class MaxPool1D(
     public val poolSize: LongArray = longArrayOf(1, 2, 1),
     public val strides: LongArray = longArrayOf(1, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
 
     init {
         requireArraySize(poolSize, 3, "poolSize")

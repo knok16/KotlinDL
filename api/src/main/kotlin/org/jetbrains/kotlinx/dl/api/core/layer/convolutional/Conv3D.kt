@@ -71,7 +71,7 @@ public class Conv3D(
     public val activityRegularizer: Regularizer? = null,
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
-    name: String = ""
+    override var name: String = ""
 ) : AbstractConv(
     filtersInternal = filters,
     kernelSizeInternal = kernelSize,
@@ -86,8 +86,7 @@ public class Conv3D(
     paddingInternal = padding,
     useBiasInternal = useBias,
     defaultKernelVariableName = KERNEL_VARIABLE_NAME,
-    defaultBiasVariableName = BIAS_VARIABLE_NAME,
-    name = name
+    defaultBiasVariableName = BIAS_VARIABLE_NAME
 ), TrainableLayer {
     public override var isTrainable: Boolean = true
 

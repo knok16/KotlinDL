@@ -23,8 +23,8 @@ import org.tensorflow.op.Ops
  * @constructor Creates [GlobalAvgPool3D] object.
  */
 public class GlobalAvgPool3D(
-    name: String = ""
-) : Layer(name) {
+    override var name: String = ""
+) : Layer() {
     override fun build(tf: Ops, inputShape: Shape) {}
 
     override fun computeOutputShape(inputShape: Shape): Shape {

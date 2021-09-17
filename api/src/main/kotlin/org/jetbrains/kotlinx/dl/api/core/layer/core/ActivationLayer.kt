@@ -21,8 +21,8 @@ import org.tensorflow.op.Ops
  */
 public class ActivationLayer(
     public val activation: Activations = Activations.Relu,
-    name: String = ""
-) : AbstractActivationLayer(name) {
+    override var name: String = ""
+) : AbstractActivationLayer() {
 
     override fun forward(
         tf: Ops,
