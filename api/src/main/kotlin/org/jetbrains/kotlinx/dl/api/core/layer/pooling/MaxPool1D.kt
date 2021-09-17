@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
@@ -41,20 +41,18 @@ public class MaxPool1D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         var steps = inputShape.size(1)
         steps = convOutputLength(steps, poolSize[1].toInt(), padding, strides[1].toInt())
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    ): OperandWithShape {
         /**
          * Since the low-level Java API does not provide a function for 1D max-pooling,
          * the 2D pooling should be used instead; therefore, the input is expanded first
@@ -62,7 +60,7 @@ public class MaxPool1D(
          * effect.
          */
         val expandAxis = 2
-        val tfInput = tf.expandDims(input, tf.constant(expandAxis))
+        val tfInput = tf.expandDims(input.operand, tf.constant(expandAxis))
         val tfPoolSize = intArrayOf(1, 1, 1, 1)
         val tfStrides = intArrayOf(1, 1, 1, 1)
         /**
@@ -84,7 +82,10 @@ public class MaxPool1D(
             tf.constant(tfStrides),
             padding.paddingName
         )
-        return tf.squeeze(maxPool, Squeeze.axis(listOf(expandAxis.toLong())))
+        return OperandWithShape(
+            tf.squeeze(maxPool, Squeeze.axis(listOf(expandAxis.toLong()))),
+            computeOutputShape(input.shape)
+        )
     }
 
     override fun toString(): String =

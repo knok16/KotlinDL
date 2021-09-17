@@ -70,12 +70,12 @@ internal class AvgPool3DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output =
+                layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses).operand.asOutput()
 
             // Check output shape is correct.
             val expectedShape = intArrayOf(input.size, 1, 1, 2, input[0][0][0][0].size)
@@ -143,12 +143,12 @@ internal class AvgPool3DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output =
+                layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses).operand.asOutput()
 
             // Check output shape is correct.
             val expectedShape = inputShape.toIntArray()
@@ -200,12 +200,12 @@ internal class AvgPool3DTest {
 
         EagerSession.create().use {
             val tf = Ops.create()
-            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output =
+                layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses).operand.asOutput()
 
             // Check output shape is correct.
             val expectedShape = intArrayOf(input.size, 1, 1, 2, input[0][0][0][0].size)

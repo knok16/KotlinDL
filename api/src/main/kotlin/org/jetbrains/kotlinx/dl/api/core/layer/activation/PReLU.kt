@@ -7,10 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
-import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
-import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
-import org.jetbrains.kotlinx.dl.api.core.layer.VariableDto
-import org.jetbrains.kotlinx.dl.api.core.layer.variable
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
@@ -49,7 +46,13 @@ public class PReLU(
     override val variables: List<VariableDto>
         get() = listOf(alpha)
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val inputShape = input.shape
         val alphaShapeArray = inputShape.toLongArray().drop(1).toLongArray()
         if (sharedAxes != null) {
             for (axis in sharedAxes) {
@@ -62,6 +65,11 @@ public class PReLU(
 
         val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
         alpha = variable(tf, alphaVariableName, alphaShape, fanIn, fanOut, alphaInitializer, alphaRegularizer)
+
+        return OperandWithShape(
+            forward(tf, input.operand),
+            input.shape
+        )
     }
 
     override fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {

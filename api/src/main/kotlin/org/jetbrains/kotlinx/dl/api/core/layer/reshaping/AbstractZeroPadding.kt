@@ -5,31 +5,37 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
  * Abstract Zero Padding layer used as the base layer for all the ZeroPadding layers.
  */
 public abstract class AbstractZeroPadding : SingleInputLayer() {
-
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val paddingOperand = tf.constant(paddingArrayToTfFormat())
+    ): OperandWithShape {
+        val paddingOperand = tf.constant(paddingArrayToTfFormat(input.shape))
         val constantValue = tf.constant(0f)
-        return tf.pad(input, paddingOperand, constantValue)
+
+        return OperandWithShape(
+            tf.pad(input.operand, paddingOperand, constantValue),
+            computeOutputShape(input.shape)
+        )
     }
+
+    protected abstract fun computeOutputShape(inputShape: Shape): Shape
 
     /**
      * This function helps in computing the padding operand i.e. normalizing the padding array
-     * into a tensorflow format. This method will then be called in [forward] method that will be
+     * into a tensorflow format. This method will then be called in [build] method that will be
      * further passed to tf.pad().
      */
-    protected abstract fun paddingArrayToTfFormat(): Array<IntArray>
+    protected abstract fun paddingArrayToTfFormat(inputShape:Shape): Array<IntArray>
 }

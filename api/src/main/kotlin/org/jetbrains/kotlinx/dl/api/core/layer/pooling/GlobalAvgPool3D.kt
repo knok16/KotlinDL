@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.util.TF
 import org.tensorflow.Operand
@@ -26,21 +26,22 @@ import org.tensorflow.op.Ops
 public class GlobalAvgPool3D(
     override var name: String = ""
 ) : SingleInputLayer() {
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         // TODO add dataFormat support
         return Shape.make(inputShape.size(0), inputShape.size(4))
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    ): OperandWithShape {
         // TODO add dataFormat support
-        return TF.mean(tf, input, tf.constant(intArrayOf(1, 2, 3)))
+        return OperandWithShape(
+            TF.mean(tf, input.operand, tf.constant(intArrayOf(1, 2, 3))),
+            computeOutputShape(input.shape)
+        )
     }
 
     override fun toString(): String {

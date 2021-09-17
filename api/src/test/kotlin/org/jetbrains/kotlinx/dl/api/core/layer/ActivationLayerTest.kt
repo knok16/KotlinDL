@@ -9,7 +9,10 @@ import org.jetbrains.kotlinx.dl.api.core.activation.EPS
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.tensorflow.*
+import org.tensorflow.EagerSession
+import org.tensorflow.Operand
+import org.tensorflow.Shape
+import org.tensorflow.Tensor
 import org.tensorflow.op.Ops
 
 internal const val IRRELEVANT_INPUT_SIZE = 8
@@ -26,11 +29,10 @@ open class ActivationLayerTest {
             val tf = Ops.create(it)
             val inputOp = tf.constant(input)
             val inputShape = inputOp.asOutput().shape()
-            layer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
 
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses)
+            val output = layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses).operand
             val actualShape = shapeFromDims(*output.asOutput().tensor().shape())
             assertEquals(expectedShape, actualShape)
 
@@ -61,10 +63,10 @@ open class ActivationLayerTest {
         EagerSession.create().use {
             val tf = Ops.create(it)
             val inputOp = tf.constant(input)
-            layer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput().tensor()
+            val output = layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses)
+                .operand.asOutput().tensor()
 
             val expectedShape = Shape.make(
                 inputSize.toLong()

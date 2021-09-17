@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -24,20 +25,21 @@ public abstract class AbstractUpSampling(
     public val interpolationInternal: InterpolationMethod
 ) : SingleInputLayer() {
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return upSample(tf, input)
-    }
+    ): OperandWithShape = OperandWithShape(
+        upSample(tf, input.operand),
+        computeOutputShape(input.shape)
+    )
+
+    protected abstract fun computeOutputShape(inputShape: Shape): Shape
 
     /**
      * The actual implementation of upsampling operation which each subclassed layer needs to
-     * implement. This method will then be called from [forward] method to upsample the input tensor.
+     * implement. This method will then be called from [build] method to upsample the input tensor.
      */
     protected abstract fun upSample(tf: Ops, input: Operand<Float>): Operand<Float>
 }

@@ -4,7 +4,7 @@
  */
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
@@ -31,9 +31,7 @@ public class Permute(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {}
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         val outputShape = inputShape.toLongArray()
         dims.forEachIndexed { i, dim ->
             val targetDim = inputShape.size(dim)
@@ -42,15 +40,18 @@ public class Permute(
         return shapeFromDims(*outputShape)
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    ): OperandWithShape {
         val permArray = intArrayOf(0) + dims
         val perm = tf.constant(permArray)
-        return tf.linalg.transpose(input, perm)
+        return OperandWithShape(
+            tf.linalg.transpose(input.operand, perm),
+            computeOutputShape(input.shape)
+        )
     }
 
     override fun toString(): String {

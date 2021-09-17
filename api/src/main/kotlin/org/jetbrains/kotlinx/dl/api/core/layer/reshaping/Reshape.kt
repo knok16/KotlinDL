@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
@@ -33,7 +33,13 @@ public class Reshape(
 ) : SingleInputLayer() {
     private lateinit var units: Constant<Int>
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val inputShape = input.shape
         val tensorShape = TensorShape(inputShape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
         units = when (targetShape.size) {
@@ -56,9 +62,14 @@ public class Reshape(
 
         fanIn = tensorShape.numElements().toInt()
         fanOut = amountOfNeuronsInFlattenLayer
+
+        return OperandWithShape(
+            tf.reshape(input.operand, units),
+            computeOutputShape(input.shape)
+        )
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         // leaves unknown dimensions unknown
         val tensorShape = TensorShape(inputShape)
         return when (targetShape.size) {
@@ -76,15 +87,6 @@ public class Reshape(
             1 -> Shape.make(tensorShape.head(), targetShape[0].toLong())
             else -> throw UnsupportedOperationException("Input shape with ${targetShape.size} dimensions is not supported.")
         }
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return tf.reshape(input, units)
     }
 
     override fun toString(): String {

@@ -1,9 +1,12 @@
 package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.shape.*
+import org.jetbrains.kotlinx.dl.api.core.util.DATA_PLACEHOLDER
+import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.junit.jupiter.api.Assertions
 import org.tensorflow.*
 import org.tensorflow.op.Ops
+import org.tensorflow.op.core.Placeholder
 
 enum class RunMode {
     EAGER,
@@ -29,12 +32,10 @@ open class LayerTest {
         input: Array<*>,
     ): Output<*> {
         val inputShape = input.shape
-        layer.build(tf, inputShape)
         val inputOp = getInputOp(tf, input)
         val isTraining = tf.constant(true)
         val numberOfLosses = tf.constant(1.0f)
-        val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
-        return output
+        return layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses).operand.asOutput()
     }
 
     private fun runLayerInEagerMode(
@@ -115,8 +116,14 @@ open class LayerTest {
         inputShapeArray: LongArray,
         expectedOutputShape: LongArray,
     ) {
+        val tf = Ops.create()
         val inputShape = shapeFromDims(*inputShapeArray)
-        val outputShape = layer.computeOutputShape(inputShape).toLongArray()
+        val input = tf.placeholder(getDType(), Placeholder.shape(inputShape))
+        val training = tf.placeholder(Boolean::class.javaObjectType, Placeholder.shape(Shape.scalar()))
+        val numberOfLossesOp = tf.placeholder(getDType(), Placeholder.shape(Shape.scalar()))
+
+        val outputShape =
+            layer.build(tf, OperandWithShape(input, inputShape), training, numberOfLossesOp).shape.toLongArray()
         Assertions.assertArrayEquals(
             expectedOutputShape,
             outputShape,

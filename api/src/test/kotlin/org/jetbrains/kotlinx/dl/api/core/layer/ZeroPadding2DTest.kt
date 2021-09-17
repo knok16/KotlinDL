@@ -33,10 +33,9 @@ internal class ZeroPadding2DTest {
             val paddingLayer = ZeroPadding2D(padding, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
-            paddingLayer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
+            val output = paddingLayer.build(tf, OperandWithShape(input, inputShape), isTraining, numberOfLosses).operand.asOutput().tensor()
 
             val expectedShape = Shape.make(
                 BATCH_SIZE.toLong(),
@@ -90,10 +89,9 @@ internal class ZeroPadding2DTest {
             val paddingLayer = ZeroPadding2D(paddingArray, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
-            paddingLayer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
+            val output = paddingLayer.build(tf, OperandWithShape(input, inputShape), isTraining, numberOfLosses).operand.asOutput().tensor()
 
             val expectedShape = Shape.make(
                 BATCH_SIZE.toLong(),
@@ -149,10 +147,9 @@ internal class ZeroPadding2DTest {
             val paddingLayer = ZeroPadding2D(paddingArray, dataFormat = CHANNELS_LAST)
             val inputDimensions = tf.constant(inputDimensionsArray)
             val input = Ones().initialize(1, 1, tf, inputDimensions, "test_input")
-            paddingLayer.build(tf, inputShape)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = paddingLayer.forward(tf, input, isTraining, numberOfLosses).asOutput().tensor()
+            val output = paddingLayer.build(tf, OperandWithShape(input, inputShape), isTraining, numberOfLosses).operand.asOutput().tensor()
 
             val expectedShape = Shape.make(
                 BATCH_SIZE.toLong(),

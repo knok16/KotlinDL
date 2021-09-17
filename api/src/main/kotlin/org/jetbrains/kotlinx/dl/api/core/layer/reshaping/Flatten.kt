@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
@@ -23,28 +24,29 @@ import kotlin.math.abs
 public class Flatten(override var name: String = "") : SingleInputLayer() {
     private lateinit var units: Constant<Int>
 
-    override fun build(tf: Ops, inputShape: Shape) {
-        val tensorShape = TensorShape(inputShape)
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val tensorShape = TensorShape(input.shape)
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
         units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))
 
         fanIn = tensorShape.numElements().toInt()
         fanOut = amountOfNeuronsInFlattenLayer
+
+        return OperandWithShape(
+            tf.reshape(input.operand, units),
+            computeOutputShape(input.shape)
+        )
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         // leaves unknown dimensions unknown
         val tensorShape = TensorShape(inputShape)
         return Shape.make(tensorShape.head(), tensorShape.numElements())
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return tf.reshape(input, units)
     }
 
     override fun toString(): String {

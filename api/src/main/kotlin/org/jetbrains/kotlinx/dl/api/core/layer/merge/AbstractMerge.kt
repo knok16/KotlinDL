@@ -5,8 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.MultipleInputsLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -20,21 +20,24 @@ import org.tensorflow.op.Ops
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
 public abstract class AbstractMerge(public val layerTypeName: String) : MultipleInputsLayer() {
-    override fun build(tf: Ops, inputShapes: List<Shape>) {}
-
-    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+    protected open fun computeOutputShape(inputShapes: List<Shape>): Shape {
         checkInputShapesOfInboundLayers(inputShapes) //TODO: crash efficientNet models
         return inputShapes[0]
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: List<Operand<Float>>,
+        input: List<OperandWithShape>,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        checkInputShapesOfInputOperands(input) //TODO: crash efficientNet models
-        return tf.withName(layerTypeName).identity(mergeFunction(input, tf))
+    ): OperandWithShape {
+        val operands = input.map { it.operand }
+        checkInputShapesOfInputOperands(operands) //TODO: crash efficientNet models
+
+        return OperandWithShape(
+            tf.withName(layerTypeName).identity(mergeFunction(operands, tf)),
+            computeOutputShape(input.map { it.shape })
+        )
     }
 
     /** Should be overridden in all AbstractMerge descendants. */

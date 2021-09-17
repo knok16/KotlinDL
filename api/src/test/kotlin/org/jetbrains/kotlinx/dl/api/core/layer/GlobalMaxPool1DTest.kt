@@ -35,12 +35,12 @@ internal class GlobalMaxPool1DTest {
         EagerSession.create().use {
             val tf = Ops.create()
             val inputShape = Shape.make(input.size.toLong(), input[0].size.toLong(), input[0][0].size.toLong())
-            layer.build(tf, inputShape)
 
             val inputOp = tf.constant(input)
             val isTraining = tf.constant(true)
             val numberOfLosses = tf.constant(1.0f)
-            val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+            val output =
+                layer.build(tf, OperandWithShape(inputOp, inputShape), isTraining, numberOfLosses).operand.asOutput()
 
             // Check output shape is correct.
             val expectedShape = intArrayOf(input.size, input[0][0].size)

@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -33,24 +33,25 @@ public class RepeatVector(
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         require(inputShape.numDimensions() == 2) {
             "Input tensor must have 2 dimensions but got ${inputShape.numDimensions()}"
         }
         return Shape.make(inputShape.size(0), n.toLong(), inputShape.size(1))
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val x = tf.expandDims(input, tf.constant(1))
+    ): OperandWithShape {
+        val x = tf.expandDims(input.operand, tf.constant(1))
         val pattern = tf.stack(listOf(tf.constant(1), tf.constant(n), tf.constant(1)))
-        return tf.tile(x, pattern)
+        return OperandWithShape(
+            tf.tile(x, pattern),
+            computeOutputShape(input.shape)
+        )
     }
 
     override fun toString(): String {

@@ -5,12 +5,10 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.LayerWithActivation
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
-import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -29,22 +27,18 @@ public abstract class AbstractActivationLayer : SingleInputLayer(), LayerWithAct
      * @param [tf] TensorFlow graph API for building operations.
      * @param [input] TensorFlow graph leaf node representing layer output before activation function.
      */
-    public abstract fun forward(
+    protected abstract fun forward(
         tf: Ops,
         input: Operand<Float>
     ): Operand<Float>
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> = forward(tf, input)
-
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        this.outputShape = TensorShape(inputShape)
-        return inputShape
-    }
+    ): OperandWithShape = OperandWithShape(
+        forward(tf, input.operand),
+        input.shape
+    )
 }

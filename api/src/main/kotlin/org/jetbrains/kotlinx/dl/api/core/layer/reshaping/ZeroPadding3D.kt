@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.tensorflow.Shape
-import org.tensorflow.op.Ops
 
 /**
  * Zero-padding layer for 3D input (e.g. video).
@@ -16,7 +15,6 @@ import org.tensorflow.op.Ops
 public class ZeroPadding3D : AbstractZeroPadding {
     override var name: String = ""
     public val padding: IntArray
-    private lateinit var inputShape: Shape
 
     /**
      * Constructs an instance of ZeroPadding3D layer
@@ -81,10 +79,6 @@ public class ZeroPadding3D : AbstractZeroPadding {
         this.name = name
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {
-        this.inputShape = inputShape
-    }
-
     override fun computeOutputShape(inputShape: Shape): Shape {
         val dim1 = inputShape.size(1) + padding[0] + padding[1]
         val dim2 = inputShape.size(2) + padding[2] + padding[3]
@@ -92,7 +86,7 @@ public class ZeroPadding3D : AbstractZeroPadding {
         return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
 
-    override fun paddingArrayToTfFormat(): Array<IntArray> {
+    override fun paddingArrayToTfFormat(inputShape: Shape): Array<IntArray> {
         val paddingFirstDim: IntArray
         val paddingSecondDim: IntArray
         val paddingThirdDim: IntArray
@@ -115,10 +109,11 @@ public class ZeroPadding3D : AbstractZeroPadding {
             }
             else -> throw IllegalArgumentException("Invalid padding argument at layer $name.")
         }
-        return paddingArraysToInputShape(paddingFirstDim, paddingSecondDim, paddingThirdDim)
+        return paddingArraysToInputShape(inputShape, paddingFirstDim, paddingSecondDim, paddingThirdDim)
     }
 
     private fun paddingArraysToInputShape(
+        inputShape: Shape,
         paddingFirstDim: IntArray,
         paddingSecondDim: IntArray,
         paddingThirdDim: IntArray

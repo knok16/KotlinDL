@@ -35,9 +35,7 @@ public class Concatenate(
 
         newShape[axe] = inputShapes.sumOf { it[axe] } // concatenated dimension
 
-        val tensorShape = newShape.clone()
-        outputShape = tensorShape
-        return tensorShape.toShape()
+        return newShape.toShape()
     }
 
     override fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {

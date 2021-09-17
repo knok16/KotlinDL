@@ -11,10 +11,11 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.AbstractConv
 import org.jetbrains.kotlinx.dl.api.core.shape.*
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.tensorflow.*
+import org.tensorflow.Graph
+import org.tensorflow.Session
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 import org.tensorflow.op.core.Constant
-import java.lang.IllegalArgumentException
 
 internal typealias FloatConv1DTensor = Array<Array<FloatArray>>
 
@@ -115,8 +116,12 @@ open class ConvLayerTest {
                     val isTraining = tf.constant(true)
                     val numberOfLosses = tf.constant(1.0f)
 
-                    layer.build(tf, input.shape)
-                    val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
+                    val output = layer.build(
+                        tf,
+                        OperandWithShape(inputOp, input.shape),
+                        isTraining,
+                        numberOfLosses
+                    ).operand.asOutput()
 
                     layer.initialize(session)
 

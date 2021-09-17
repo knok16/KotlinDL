@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
@@ -40,9 +40,7 @@ public class AvgPool3D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         var dim1 = inputShape.size(1)
         var dim2 = inputShape.size(2)
         var dim3 = inputShape.size(3)
@@ -53,18 +51,16 @@ public class AvgPool3D(
         return Shape.make(inputShape.size(0), dim1, dim2, dim3, inputShape.size(4))
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    ): OperandWithShape {
         val tfPadding = padding.paddingName
-        return tf.nn.avgPool3d(
-            input,
-            poolSize.toList(),
-            strides.toList(),
-            tfPadding
+        return OperandWithShape(
+            tf.nn.avgPool3d(input.operand, poolSize.toList(), strides.toList(), tfPadding),
+            computeOutputShape(input.shape)
         )
     }
 

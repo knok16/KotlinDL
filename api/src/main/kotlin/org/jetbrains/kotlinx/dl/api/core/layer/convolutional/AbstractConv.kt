@@ -31,14 +31,14 @@ import kotlin.math.roundToInt
  * @property [kernelSizeInternal] numbers used by default in calculation of layer weights and i/o shapes
  * @property [stridesInternal] numbers used by default in calculation of layer weights and i/o shapes
  * @property [dilationsInternal] numbers to keep for the dilations for implementation
- * @property [activationInternal] activation used in [forward] operation implementation
+ * @property [activationInternal] activation used in [build] operation implementation
  * @property [kernelInitializerInternal] initializer used in actual kernel variable filling implementation
  * @property [biasInitializerInternal] initializer used in actual bias variable filling implementation
  * @property [kernelRegularizerInternal] regularizer function used in actual kernel variable filling implementation
  * @property [biasRegularizerInternal] regularizer function used in actual bias variable filling implementation
  * @property [activityRegularizerInternal] regularizer function applied to the output of the layer
  * @property [paddingInternal] numbers to keep for the padding for implementation
- * @property [useBiasInternal] flag if bias should be used during actual [forward] implementation
+ * @property [useBiasInternal] flag if bias should be used during actual [build] implementation
  * @property [defaultKernelVariableName] name of kernel used when no layer name is defined
  * @property [defaultBiasVariableName] name of bias used when no layer name is defined
  * @constructor Creates [AbstractConv] object
@@ -70,7 +70,13 @@ public abstract class AbstractConv(
     /** Tensor with bias weights */
     public var bias: VariableDto? = null
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val inputShape = input.shape
         // Amount of channels should be the last value in the inputShape
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -104,25 +110,14 @@ public abstract class AbstractConv(
                 biasRegularizerInternal
             )
         }
-    }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        val shape = defineOutputShape(inputShape)
-        outputShape = TensorShape(shape)
-        return shape
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val convolution = convImplementation(tf, input)
-
+        val convolution = convImplementation(tf, input.operand)
         val withBias = bias?.let { tf.nn.biasAdd(convolution, it.variable) } ?: convolution
 
-        return Activations.convert(activationInternal).apply(tf, withBias, name)
+        return OperandWithShape(
+            Activations.convert(activationInternal).apply(tf, withBias, name),
+            defineOutputShape(inputShape)
+        )
     }
 
     /** Define the number of output channels given the number of input channels.

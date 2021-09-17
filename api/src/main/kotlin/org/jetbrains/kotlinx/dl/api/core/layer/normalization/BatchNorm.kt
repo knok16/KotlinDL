@@ -60,7 +60,13 @@ public class BatchNorm(
     public lateinit var movingMean: VariableDto
     public lateinit var movingVariance: VariableDto
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val inputShape = input.shape
         // Compute shapes of kernel and bias matrices
         val weightShape = Shape.make(inputShape.size(axis[0]))
 
@@ -82,17 +88,16 @@ public class BatchNorm(
             val betaVariableName = batchNormBetaVarName(name)
             beta = variable(tf, betaVariableName, weightShape, fanIn, fanOut, betaInitializer, betaRegularizer)
         }
+
+        return OperandWithShape(
+            forward(tf, input.operand),
+            inputShape
+        )
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return inputShape
-    }
-
-    override fun forward(
+    private fun forward(
         tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
+        input: Operand<Float>
     ): Operand<Float> {
         val tf = tf.withName("BatchNorm")
         return batchNorm(

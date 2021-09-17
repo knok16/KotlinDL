@@ -62,17 +62,35 @@ public class Dense(
     public lateinit var kernel: VariableDto
     public var bias: VariableDto? = null
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val inputShape = input.shape
         fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
         fanOut = outputSize
 
         val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         kernel = variable(tf, kernelVariableName, kernelShape, fanIn, fanOut, kernelInitializer, kernelRegularizer)
 
-        if (useBias) {
+        val matMul = tf.linalg.matMul(input.operand, kernel.variable)
+
+        val signal = if (useBias) {
             val biasShape = Shape.make(outputSize.toLong())
-            bias = variable(tf, biasVariableName, biasShape, fanIn, fanOut, biasInitializer, biasRegularizer)
+            val biasVar = variable(tf, biasVariableName, biasShape, fanIn, fanOut, biasInitializer, biasRegularizer)
+            bias = biasVar
+
+            tf.math.add(matMul, biasVar.variable)
+        } else {
+            matMul
         }
+
+        return OperandWithShape(
+            Activations.convert(activation).apply(tf, signal, name),
+            TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
+        )
     }
 
     private val kernelVariableName: String
@@ -80,21 +98,6 @@ public class Dense(
 
     private val biasVariableName: String
         get() = if (name.isNotEmpty()) denseBiasVarName(name) else BIAS_VARIABLE_NAME
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        val matMul = tf.linalg.matMul(input, kernel.variable)
-        val signal = bias?.let { tf.math.add(matMul, it.variable) } ?: matMul
-        return Activations.convert(activation).apply(tf, signal, name)
-    }
 
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer)"

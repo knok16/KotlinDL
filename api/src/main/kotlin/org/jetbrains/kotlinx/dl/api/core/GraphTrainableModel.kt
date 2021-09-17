@@ -153,8 +153,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         this.callback = callback
         this.callback.model = this
 
-        buildLayers()
-
         // should be after outputShape calculation
         numberOfClasses = when (layers.last()::class) {
             Dense::class -> (layers.last() as Dense).outputSize.toLong()
@@ -162,20 +160,18 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                 .last()  // valid for mobileNet/DenseNet
             else -> 1
         }
-
-        xOp = inputLayer.input
-        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
+        training = tf.withName("training").placeholder(
+            Boolean::class.javaObjectType,
+            Placeholder.shape(Shape.scalar())
+        )
         numberOfLossesOp = tf.withName("numberOfLosses").placeholder(
             getDType(),
             Placeholder.shape(Shape.scalar())
         )
 
-        training = tf.withName("training").placeholder(
-            Boolean::class.javaObjectType,
-            Placeholder.shape(Shape.scalar())
-        )
-
-        yPredOp = forward(xOp)
+        yPredOp = buildLayers(training, numberOfLossesOp)
+        xOp = inputLayer.input
+        yTrueOp = tf.placeholder(getDType()) as Operand<Float>
         lossOp = buildLossFunction(loss)
         targets = optimizer.prepareTargets(kGraph, layers.trainableLayerVariables().map { it.variable }, tf, lossOp)
 
@@ -224,10 +220,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     }
 
     /** Common method for building the initial part of the model static graph layer by layer via calling build() method on each layer in correct order. */
-    protected abstract fun buildLayers()
-
-    /** Forms forward path as a part of the model static graph layer by layer via calling forward() method on each layer in correct order. */
-    protected abstract fun forward(input: Operand<Float>): Operand<Float>
+    protected abstract fun buildLayers(training: Operand<Boolean>, numberOfLossesOp: Operand<Float>): Operand<Float>
 
     override fun fit(
         trainingDataset: Dataset,

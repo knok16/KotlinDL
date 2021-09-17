@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSerializedModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.serializeModel
 import org.tensorflow.Operand
-import org.tensorflow.Shape
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -132,33 +132,30 @@ public class Sequential internal constructor(vararg layers: Layer) : GraphTraina
         }
     }
 
-    override fun buildLayers() {
-        inputLayer.build(tf)
-        var inputShape: Shape = inputLayer.computeOutputShape()
+    override fun buildLayers(training: Operand<Boolean>, numberOfLossesOp: Operand<Float>): Operand<Float> {
+        lateinit var output: OperandWithShape
 
-        layers.filterIsInstance<SingleInputLayer>().forEach {
-            it.build(tf, inputShape)
+        layers.forEach { layer ->
+            output = when (layer) {
+                is NoInputsLayer -> layer.build(tf, training, numberOfLossesOp)
+                is SingleInputLayer -> layer.build(tf, output, training, numberOfLossesOp)
+                is MultipleInputsLayer -> throw IllegalStateException("MultipleInputsLayer '${layer.name}' is not supported by Sequential builder")
+            }
 
-            inputShape = it.computeOutputShape(inputShape)
-            val tensorShape = TensorShape(inputShape)
-            val dims = tensorShape.dims()
-
-            check(tensorShape.tail().all { elem -> elem > 0 })
-            {
-                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
+            val outputShape = TensorShape(output.shape)
+            check(outputShape.tail().all { elem -> elem > 0 }) {
+                val dims = outputShape.dims()
+                "The last dimensions (except first = -1) of shape of layer ${layer.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = tensorShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
+            layer.outputShape = outputShape //TODO: Refactoring: it could be done inside build
 
-            logger.debug { "${it.name}; $it; outputShape: $tensorShape" }
+            logger.debug { "${layer.name}; $layer; outputShape: $outputShape" }
         }
+
+        return output.operand
     }
-
-    override fun forward(input: Operand<Float>): Operand<Float> =
-        layers.filterIsInstance<SingleInputLayer>().fold(input) { acc, layer ->
-            layer.forward(tf, acc, training, numberOfLossesOp)
-        }
 
     public override fun summary(
         stringLayerNameTypeSize: Int,

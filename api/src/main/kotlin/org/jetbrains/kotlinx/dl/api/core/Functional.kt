@@ -10,6 +10,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
+import org.tensorflow.op.core.Placeholder
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -218,49 +219,33 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun buildLayers() {
+    override fun buildLayers(training: Operand<Boolean>, numberOfLossesOp: Operand<Float>): Operand<Float> {
+        lateinit var output: OperandWithShape
+        val outputByLayerName = mutableMapOf<String, OperandWithShape>()
+
         layers.forEach { layer ->
-            val inputShapes = layer.inboundLayers.map { it.outputShape.toShape() }
-            when (layer) {
-                is NoInputsLayer -> layer.build(tf)
-                is SingleInputLayer -> layer.build(tf, inputShapes[0])
-                is MultipleInputsLayer -> layer.build(tf, inputShapes)
+            val inputs = layer.inboundLayers.map { outputByLayerName.getValue(it.name) }
+
+            output = when (layer) {
+                is NoInputsLayer -> layer.build(tf, training, numberOfLossesOp)
+                is SingleInputLayer -> layer.build(tf, inputs[0], training, numberOfLossesOp)
+                is MultipleInputsLayer -> layer.build(tf, inputs, training, numberOfLossesOp)
             }
+            outputByLayerName[layer.name] = output
 
-            val outputShape = TensorShape(when (layer) {
-                is NoInputsLayer -> layer.computeOutputShape()
-                is SingleInputLayer -> layer.computeOutputShape(inputShapes[0])
-                is MultipleInputsLayer -> layer.computeOutputShape(inputShapes)
-            })
-            val dims = outputShape.dims()
-
-            check(outputShape.tail().all { elem -> elem > 0 })
-            {
+            val outputShape = TensorShape(output.shape)
+            check(outputShape.tail().all { elem -> elem > 0 }) {
+                val dims = outputShape.dims()
                 "The last dimensions (except first = -1) of shape of layer ${layer.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            layer.outputShape = outputShape //TODO: Refactoring: layer could be done inside computeOutputShapeMethods
+            layer.outputShape = outputShape //TODO: Refactoring: layer could be done inside build
 
             logger.info { "${layer.name}; outputShape: $outputShape $layer" }
         }
-    }
 
-    override fun forward(input: Operand<Float>): Operand<Float> {
-        var output: Operand<Float> = input
-        val outputByLayerName = mutableMapOf<String, Operand<Float>>()
-
-        for (layer in layers) {
-            val inputs = layer.inboundLayers.map { outputByLayerName.getValue(it.name) }
-
-            output = when (layer) {
-                is NoInputsLayer -> layer.forward(tf, training, numberOfLossesOp)
-                is SingleInputLayer -> layer.forward(tf, inputs[0], training, numberOfLossesOp)
-                is MultipleInputsLayer -> layer.forward(tf, inputs, training, numberOfLossesOp)
-            }
-            outputByLayerName[layer.name] = output
-        }
-        return output
+        return output.operand
     }
 
     override fun save(

@@ -11,7 +11,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
@@ -93,7 +92,13 @@ public class SeparableConv2D(
         requireArraySize(dilations, 4, "dilations")
     }
 
-    override fun build(tf: Ops, inputShape: Shape) {
+    override fun build(
+        tf: Ops,
+        input: OperandWithShape,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): OperandWithShape {
+        val inputShape = input.shape
         // Amount of channels should be the last value in the inputShape (make warning here)
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
@@ -106,6 +111,11 @@ public class SeparableConv2D(
         fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
         createSeparableConv2DVariables(tf, numberOfChannels)
+
+        return OperandWithShape(
+            forward(tf, input.operand),
+            computeOutputShape(input.shape)
+        )
     }
 
     private val depthwiseKernelVariableName: String
@@ -146,7 +156,7 @@ public class SeparableConv2D(
         }
     }
 
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         var rows = inputShape.size(1)
         var cols = inputShape.size(2)
         rows = convOutputLength(
@@ -158,17 +168,10 @@ public class SeparableConv2D(
             strides[2].toInt(), dilations[2].toInt()
         )
 
-        val shape = Shape.make(inputShape.size(0), rows, cols, filters)
-        outputShape = TensorShape(shape)
-        return shape
+        return Shape.make(inputShape.size(0), rows, cols, filters)
     }
 
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    private fun forward(tf: Ops, input: Operand<Float>): Operand<Float> {
         val paddingName = padding.paddingName
         val depthwiseConv2DOptions: DepthwiseConv2dNative.Options = dilations(dilations.toList()).dataFormat("NHWC")
 

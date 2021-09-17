@@ -45,77 +45,46 @@ public sealed class Layer {
     }
 }
 
+public data class OperandWithShape(
+    val operand: Operand<Float>,
+    val shape: Shape
+)
+
 public abstract class NoInputsLayer : Layer() {
     /**
-     * Extend this function to define variables in layer.
+     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
      *
      * @param [tf] TensorFlow graph API for building operations.
      */
-    public abstract fun build(tf: Ops)
-
-    /**
-     * Computes output shape, based [Layer] type.
-     */
-    public abstract fun computeOutputShape(): Shape
-
-    /**
-     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
-     */
-    public abstract fun forward(
+    public abstract fun build(
         tf: Ops,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float>
+    ): OperandWithShape
 }
 
 public abstract class SingleInputLayer : Layer() {
     /**
-     * Extend this function to define variables in layer.
-     *
-     * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShape] Input shape, result of [computeOutputShape] call from previous layer.
-     */
-    public abstract fun build(tf: Ops, inputShape: Shape)
-
-    /**
-     * Computes output shape, based on [inputShape] and [Layer] type.
-     */
-    public abstract fun computeOutputShape(inputShape: Shape): Shape
-
-    /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
      */
-    public abstract fun forward(
+    public abstract fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float>
+    ): OperandWithShape
 }
 
 public abstract class MultipleInputsLayer : Layer() {
     /**
-     * Extend this function to define variables in layer.
-     *
-     * @param [tf] TensorFlow graph API for building operations.
-     * @param [inputShapes] Input shapes, result of [computeOutputShape] call from previous layer.
-     */
-    public abstract fun build(tf: Ops, inputShapes: List<Shape>)
-
-    /**
-     * Computes output shape, based on input shapes of inbound layers.
-     */
-    public abstract fun computeOutputShape(inputShapes: List<Shape>): Shape
-
-    /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
      */
-    public abstract fun forward(
+    public abstract fun build(
         tf: Ops,
-        input: List<Operand<Float>>,
+        input: List<OperandWithShape>,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float>
+    ): OperandWithShape
 }
 
 internal fun requireArraySize(array: LongArray, size: Int, name: String) =

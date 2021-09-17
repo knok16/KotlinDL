@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
@@ -41,22 +41,20 @@ public class AvgPool1D(
         }
     }
 
-    override fun build(tf: Ops, inputShape: Shape): Unit = Unit
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
+    private fun computeOutputShape(inputShape: Shape): Shape {
         var steps = inputShape.size(1)
         steps = convOutputLength(steps, poolSize[1].toInt(), padding, strides[1].toInt())
         return Shape.make(inputShape.size(0), steps, inputShape.size(2))
     }
 
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    ): OperandWithShape {
         val expandAxis = 2
-        val tfInput = tf.expandDims(input, tf.constant(expandAxis))
+        val tfInput = tf.expandDims(input.operand, tf.constant(expandAxis))
 
         val tfPoolSize = longArrayOf(1, 1, 1, 1)
         val tfStrides = longArrayOf(1, 1, 1, 1)
@@ -72,7 +70,10 @@ public class AvgPool1D(
             tfPadding
         )
 
-        return tf.squeeze(avgPool, Squeeze.axis(listOf(expandAxis.toLong())))
+        return OperandWithShape(
+            tf.squeeze(avgPool, Squeeze.axis(listOf(expandAxis.toLong()))),
+            computeOutputShape(input.shape)
+        )
     }
 
     override fun toString(): String =

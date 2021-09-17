@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.regularization
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
+import org.jetbrains.kotlinx.dl.api.core.layer.OperandWithShape
 import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -32,19 +33,12 @@ public class Dropout(
     private val seed: Long = 12L,
     override var name: String = ""
 ) : SingleInputLayer(), NoGradients {
-    override fun build(tf: Ops, inputShape: Shape) {
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        return inputShape
-    }
-
-    override fun forward(
+    override fun build(
         tf: Ops,
-        input: Operand<Float>,
+        input: OperandWithShape,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
+    ): OperandWithShape {
         /* if (isTraining) {
              val trainingFactor = tf.placeholderWithDefault(tf.constant(1.0f), Shape.scalar())
 
