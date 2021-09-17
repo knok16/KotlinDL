@@ -60,7 +60,7 @@ public abstract class AbstractConv(
     protected val useBiasInternal: Boolean,
     protected val defaultKernelVariableName: String,
     protected val defaultBiasVariableName: String
-) : Layer(), ParametrizedLayer, LayerWithActivation {
+) : SingleInputLayer(), ParametrizedLayer, LayerWithActivation {
     public override val variables: List<VariableDto>
         get() = listOfNotNull(kernel, bias)
 

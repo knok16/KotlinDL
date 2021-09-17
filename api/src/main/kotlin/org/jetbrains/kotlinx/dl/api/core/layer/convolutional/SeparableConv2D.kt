@@ -78,7 +78,7 @@ public class SeparableConv2D(
     public val padding: ConvPadding = ConvPadding.SAME,
     public val useBias: Boolean = true,
     override var name: String = ""
-) : Layer(), NoGradients, ParametrizedLayer, LayerWithActivation {
+) : SingleInputLayer(), NoGradients, ParametrizedLayer, LayerWithActivation {
     override val variables: List<VariableDto>
         get() = listOfNotNull(depthwiseKernel, pointwiseKernel, bias)
 

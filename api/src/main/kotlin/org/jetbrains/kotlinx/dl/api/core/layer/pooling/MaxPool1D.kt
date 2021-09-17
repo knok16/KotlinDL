@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.pooling
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
@@ -30,7 +31,7 @@ public class MaxPool1D(
     public val strides: LongArray = longArrayOf(1, 2, 1),
     public val padding: ConvPadding = ConvPadding.VALID,
     override var name: String = ""
-) : Layer() {
+) : SingleInputLayer() {
 
     init {
         requireArraySize(poolSize, 3, "poolSize")

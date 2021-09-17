@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.activation
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.LayerWithActivation
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -21,7 +22,7 @@ import org.tensorflow.op.Ops
  * By default, it defines returning the output with the same shape
  * as the input Operand.
  */
-public abstract class AbstractActivationLayer : Layer(), LayerWithActivation {
+public abstract class AbstractActivationLayer : SingleInputLayer(), LayerWithActivation {
     /**
      * Applies the activation functions to the [input] to produce the output.
      *

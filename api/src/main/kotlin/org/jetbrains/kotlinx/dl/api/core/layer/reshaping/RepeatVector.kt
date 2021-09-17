@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -26,7 +27,7 @@ import org.tensorflow.op.Ops
 public class RepeatVector(
     public val n: Int,
     override var name: String = ""
-) : Layer() {
+) : SingleInputLayer() {
 
     init {
         require(n >= 1) { "Number of repetitions (n) in RepeatVector should be positive but got $n" }

@@ -17,7 +17,7 @@ internal const val IRRELEVANT_INPUT_SIZE = 8
 open class ActivationLayerTest {
 
     protected fun assertActivationFunction2D(
-        layer: Layer,
+        layer: SingleInputLayer,
         input: Array<FloatArray>,
         expectedShape: Shape,
         expected: Array<FloatArray>
@@ -50,7 +50,7 @@ open class ActivationLayerTest {
 
 
     protected fun assertActivationFunction(
-        layer: Layer,
+        layer: SingleInputLayer,
         input: FloatArray,
         actual: FloatArray,
         expected: FloatArray
@@ -84,13 +84,13 @@ open class ActivationLayerTest {
     }
 
     protected fun assertActivationFunctionSameOutputShape(
-        layer: Layer,
+        layer: SingleInputLayer,
         input: FloatArray,
         expected: FloatArray
     ) = assertActivationFunction(layer, input, FloatArray(input.size), expected)
 
     protected fun assertActivationFunctionIrrelevantInputOutput(
-        layer: Layer
+        layer: SingleInputLayer
     ) {
         val irrelevantArrayData = FloatArray(IRRELEVANT_INPUT_SIZE)
         assertActivationFunctionSameOutputShape(layer, irrelevantArrayData, irrelevantArrayData)

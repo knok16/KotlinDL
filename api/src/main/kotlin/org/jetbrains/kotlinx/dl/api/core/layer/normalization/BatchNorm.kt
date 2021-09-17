@@ -51,7 +51,7 @@ public class BatchNorm(
     public val movingMeanInitializer: Initializer = Zeros(),
     public val movingVarianceInitializer: Initializer = Ones(),
     override var name: String = "",
-) : Layer(), NoGradients, ParametrizedLayer {
+) : SingleInputLayer(), NoGradients, ParametrizedLayer {
     override val variables: List<VariableDto>
         get() = listOfNotNull(gamma, beta, movingMean, movingVariance)
 

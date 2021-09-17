@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -19,7 +20,7 @@ import kotlin.math.abs
  * @property [name] Custom layer name.
  * @constructor Creates [Flatten] object.
  */
-public class Flatten(override var name: String = "") : Layer() {
+public class Flatten(override var name: String = "") : SingleInputLayer() {
     private lateinit var units: Constant<Int>
 
     override fun build(tf: Ops, inputShape: Shape) {

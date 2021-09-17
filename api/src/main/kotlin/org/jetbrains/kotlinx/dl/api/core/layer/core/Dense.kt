@@ -54,7 +54,7 @@ public class Dense(
     public val useBias: Boolean = true,
     override var name: String = "",
     override var isTrainable: Boolean = true
-) : Layer(), ParametrizedLayer, TrainableLayer, LayerWithActivation {
+) : SingleInputLayer(), ParametrizedLayer, TrainableLayer, LayerWithActivation {
     override val variables: List<VariableDto>
         get() = listOfNotNull(kernel, bias)
 

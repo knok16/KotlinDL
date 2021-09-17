@@ -25,7 +25,7 @@ open class LayerTest {
 
     private fun getLayerOutputOp(
         tf: Ops,
-        layer: Layer,
+        layer: SingleInputLayer,
         input: Array<*>,
     ): Output<*> {
         val inputShape = input.shape
@@ -38,7 +38,7 @@ open class LayerTest {
     }
 
     private fun runLayerInEagerMode(
-        layer: Layer,
+        layer: SingleInputLayer,
         input: Array<*>,
     ): Tensor<*> {
         EagerSession.create().use {
@@ -49,7 +49,7 @@ open class LayerTest {
     }
 
     private fun runLayerInGraphMode(
-        layer: Layer,
+        layer: SingleInputLayer,
         input: Array<*>,
     ): Tensor<*> {
         Graph().use { graph ->
@@ -74,7 +74,7 @@ open class LayerTest {
      * Note that this method could be used for a layer with any input/output dimensionality.
      */
     protected fun assertLayerOutputIsCorrect(
-        layer: Layer,
+        layer: SingleInputLayer,
         input: Array<*>,
         expectedOutput: Array<*>,
         runMode: RunMode = RunMode.EAGER,
@@ -111,7 +111,7 @@ open class LayerTest {
      * expected output shape ([expectedOutputShape]).
      */
     protected fun assertLayerComputedOutputShape(
-        layer: Layer,
+        layer: SingleInputLayer,
         inputShapeArray: LongArray,
         expectedOutputShape: LongArray,
     ) {

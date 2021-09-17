@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
@@ -218,40 +219,46 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
     }
 
     override fun buildLayers() {
-        inputLayer.build(tf)
-        inputLayer.computeOutputShape()
+        layers.forEach { layer ->
+            val inputShapes = layer.inboundLayers.map { it.outputShape.toShape() }
+            when (layer) {
+                is NoInputsLayer -> layer.build(tf)
+                is SingleInputLayer -> layer.build(tf, inputShapes[0])
+                is MultipleInputsLayer -> layer.build(tf, inputShapes)
+            }
 
-        layers.filter { it !is Input }.forEach {
-            it.buildFromInboundLayers(tf)
-
-            val outputShape = it.computeOutputShapeFromInboundLayers()
+            val outputShape = TensorShape(when (layer) {
+                is NoInputsLayer -> layer.computeOutputShape()
+                is SingleInputLayer -> layer.computeOutputShape(inputShapes[0])
+                is MultipleInputsLayer -> layer.computeOutputShape(inputShapes)
+            })
             val dims = outputShape.dims()
 
             check(outputShape.tail().all { elem -> elem > 0 })
             {
-                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
+                "The last dimensions (except first = -1) of shape of layer ${layer.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = outputShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
+            layer.outputShape = outputShape //TODO: Refactoring: layer could be done inside computeOutputShapeMethods
 
-            logger.info { "${it.name}; outputShape: $outputShape $it" }
+            logger.info { "${layer.name}; outputShape: $outputShape $layer" }
         }
     }
 
-    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
+    override fun forward(input: Operand<Float>): Operand<Float> {
         var output: Operand<Float> = input
         val outputByLayerName = mutableMapOf<String, Operand<Float>>()
-        val outputs = mutableListOf<Operand<Float>>()
-        outputs.add(input)
-        outputByLayerName[inputLayer.name] = input
+
         for (layer in layers) {
-            for (inboundLayer in layer.inboundLayers) {
-                outputs.add(outputByLayerName[inboundLayer.name]!!)
+            val inputs = layer.inboundLayers.map { outputByLayerName.getValue(it.name) }
+
+            output = when (layer) {
+                is NoInputsLayer -> layer.forward(tf, training, numberOfLossesOp)
+                is SingleInputLayer -> layer.forward(tf, inputs[0], training, numberOfLossesOp)
+                is MultipleInputsLayer -> layer.forward(tf, inputs, training, numberOfLossesOp)
             }
-            output = layer.forward(tf, outputs, training, numberOfLossesOp)
             outputByLayerName[layer.name] = output
-            outputs.clear()
         }
         return output
     }

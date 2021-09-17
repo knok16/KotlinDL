@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -22,10 +23,9 @@ public class Concatenate(
     public var axis: Int = 3,
     override var name: String = ""
 ) : AbstractMerge("ConcatenateLayer"), NoGradients {
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        val inputShapes = mutableListOf<TensorShape>()
-        inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
-        val newShape = inputShapes[0].clone()
+    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+        val inputShapes = inputShapes.map { TensorShape(it) }
+        val newShape = inputShapes[0]
 
         var axe = axis
         if (axis == -1) { // it influences on nasmobilemodel
@@ -33,12 +33,11 @@ public class Concatenate(
             axe = (rank + axis) // to make axe positive
         }
 
-
         newShape[axe] = inputShapes.sumOf { it[axe] } // concatenated dimension
 
         val tensorShape = newShape.clone()
         outputShape = tensorShape
-        return tensorShape
+        return tensorShape.toShape()
     }
 
     override fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {

@@ -58,7 +58,7 @@ internal class MaxPool3DTest {
     )
 
     private fun assertMaxPool3D(
-        layer: Layer,
+        layer: SingleInputLayer,
         expected: Array<Array<Array<Array<FloatArray>>>>,
         input: Array<Array<Array<Array<FloatArray>>>> = inputArr
     ) {

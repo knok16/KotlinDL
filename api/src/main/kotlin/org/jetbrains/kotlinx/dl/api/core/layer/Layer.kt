@@ -14,7 +14,7 @@ import org.tensorflow.op.Ops
 /**
  * Base abstract class for all layers.
  */
-public abstract class Layer {
+public sealed class Layer {
     /**
      * Layer name. Would be changed if empty during model compilation.
      */
@@ -38,6 +38,37 @@ public abstract class Layer {
     /** Returns outbound layers. */
     public var outboundLayers: MutableList<Layer> = mutableListOf()
 
+    /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */
+    public operator fun invoke(vararg layers: Layer): Layer {
+        inboundLayers = layers.toMutableList()
+        return this
+    }
+}
+
+public abstract class NoInputsLayer : Layer() {
+    /**
+     * Extend this function to define variables in layer.
+     *
+     * @param [tf] TensorFlow graph API for building operations.
+     */
+    public abstract fun build(tf: Ops)
+
+    /**
+     * Computes output shape, based [Layer] type.
+     */
+    public abstract fun computeOutputShape(): Shape
+
+    /**
+     * Builds main layer input transformation with [tf]. Depends on [Layer] type.
+     */
+    public abstract fun forward(
+        tf: Ops,
+        isTraining: Operand<Boolean>,
+        numberOfLosses: Operand<Float>?
+    ): Operand<Float>
+}
+
+public abstract class SingleInputLayer : Layer() {
     /**
      * Extend this function to define variables in layer.
      *
@@ -46,35 +77,10 @@ public abstract class Layer {
      */
     public abstract fun build(tf: Ops, inputShape: Shape)
 
-
-    /**
-     * Extend this function to define variables in layer.
-     *
-     * NOTE: This function should be overridden for layers with multiple inputs.
-     * NOTE: Used in Functional API
-     *
-     * @param [tf] TensorFlow graph API for building operations.
-     */
-    public fun buildFromInboundLayers(tf: Ops) {
-        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        build(tf, inboundLayers[0].outputShape.toShape())
-    }
-
     /**
      * Computes output shape, based on [inputShape] and [Layer] type.
      */
     public abstract fun computeOutputShape(inputShape: Shape): Shape
-
-    /**
-     * Computes output shape, based on input shapes of inbound layers.
-     *
-     * NOTE: This function should be overridden for layers with multiple inputs.
-     * NOTE: Used in Functional API
-     */
-    public open fun computeOutputShapeFromInboundLayers(): TensorShape {
-        require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        return TensorShape(computeOutputShape(inboundLayers[0].outputShape.toShape()))
-    }
 
     /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
@@ -85,24 +91,31 @@ public abstract class Layer {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): Operand<Float>
+}
+
+public abstract class MultipleInputsLayer : Layer() {
+    /**
+     * Extend this function to define variables in layer.
+     *
+     * @param [tf] TensorFlow graph API for building operations.
+     * @param [inputShapes] Input shapes, result of [computeOutputShape] call from previous layer.
+     */
+    public abstract fun build(tf: Ops, inputShapes: List<Shape>)
+
+    /**
+     * Computes output shape, based on input shapes of inbound layers.
+     */
+    public abstract fun computeOutputShape(inputShapes: List<Shape>): Shape
 
     /**
      * Builds main layer input transformation with [tf]. Depends on [Layer] type.
      */
-    public open fun forward(
+    public abstract fun forward(
         tf: Ops,
         input: List<Operand<Float>>,
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return forward(tf, input[0], isTraining, numberOfLosses)
-    }
-
-    /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */
-    public operator fun invoke(vararg layers: Layer): Layer {
-        inboundLayers = layers.toMutableList()
-        return this
-    }
+    ): Operand<Float>
 }
 
 internal fun requireArraySize(array: LongArray, size: Int, name: String) =

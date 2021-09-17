@@ -5,6 +5,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
@@ -22,7 +23,7 @@ import org.tensorflow.op.Ops
 public class Permute(
     public val dims: IntArray,
     override var name: String = ""
-) : Layer() {
+) : SingleInputLayer() {
 
     init {
         require(dims.sorted() == (1..dims.size).toList()) {

@@ -175,7 +175,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             Placeholder.shape(Shape.scalar())
         )
 
-        yPredOp = forward(xOp, inputLayer)
+        yPredOp = forward(xOp)
         lossOp = buildLossFunction(loss)
         targets = optimizer.prepareTargets(kGraph, layers.trainableLayerVariables().map { it.variable }, tf, lossOp)
 
@@ -227,7 +227,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
     protected abstract fun buildLayers()
 
     /** Forms forward path as a part of the model static graph layer by layer via calling forward() method on each layer in correct order. */
-    protected abstract fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float>
+    protected abstract fun forward(input: Operand<Float>): Operand<Float>
 
     override fun fit(
         trainingDataset: Dataset,

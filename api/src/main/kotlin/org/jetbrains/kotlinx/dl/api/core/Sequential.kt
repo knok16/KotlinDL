@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.*
-import org.jetbrains.kotlinx.dl.api.core.layer.weights
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
@@ -26,7 +25,7 @@ import java.io.FileNotFoundException
  * @property [layers] the layers to describe the model design.
  * @constructor Creates a Sequential group with [inputLayer] and [layers].
  */
-public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
+public class Sequential internal constructor(vararg layers: Layer) : GraphTrainableModel(*layers) {
     public companion object {
         /**
          * Creates the [Sequential] model.
@@ -36,11 +35,12 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
          * @return the [Sequential] model.
          */
         @JvmStatic
-        public fun of(vararg layers: Layer): Sequential {
-            layerValidation(layers.toList())
-
-            preProcessLayerNames(layers)
-            return Sequential(*layers)
+        public fun of(input: Input, vararg layers: SingleInputLayer): Sequential {
+            val allLayers = mutableListOf<Layer>()
+            allLayers.add(input)
+            allLayers.addAll(layers)
+            preProcessLayerNames(allLayers.toTypedArray())
+            return Sequential(input, *layers)
         }
 
         /**
@@ -53,8 +53,12 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         public fun of(layers: List<Layer>): Sequential {
             layerValidation(layers.toList())
 
-            preProcessLayerNames(layers.toTypedArray())
-            return Sequential(*layers.toTypedArray())
+            val layersAfterFirstOne = layers.drop(1)
+            require(layersAfterFirstOne.all { it is SingleInputLayer }) {
+                "Only layers with single input allowed"
+            }
+
+            return of(layers[0] as Input, *layersAfterFirstOne.map { it as SingleInputLayer }.toTypedArray())
         }
 
         /**
@@ -132,7 +136,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         inputLayer.build(tf)
         var inputShape: Shape = inputLayer.computeOutputShape()
 
-        layers.filter { it !is Input }.forEach {
+        layers.filterIsInstance<SingleInputLayer>().forEach {
             it.build(tf, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
@@ -151,13 +155,10 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
         }
     }
 
-    override fun forward(input: Operand<Float>, inputLayer: Input): Operand<Float> {
-        var out: Operand<Float> = input
-        for (layer in layers) {
-            out = layer.forward(tf, out, training, numberOfLossesOp)
+    override fun forward(input: Operand<Float>): Operand<Float> =
+        layers.filterIsInstance<SingleInputLayer>().fold(input) { acc, layer ->
+            layer.forward(tf, acc, training, numberOfLossesOp)
         }
-        return out
-    }
 
     public override fun summary(
         stringLayerNameTypeSize: Int,

@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.activation.*
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
@@ -46,7 +47,7 @@ internal fun deserializeSequentialModel(sequentialConfig: KerasModel?): Sequenti
     val input: Input = pair.first
     val layers = pair.second
 
-    return Sequential.of(input, *layers.toList().toTypedArray())
+    return Sequential.of(input, *layers.map { it as SingleInputLayer }.toTypedArray())
 }
 
 /**

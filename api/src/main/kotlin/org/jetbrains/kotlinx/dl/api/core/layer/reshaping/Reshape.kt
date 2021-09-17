@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -29,7 +30,7 @@ import kotlin.math.abs
 public class Reshape(
     public val targetShape: List<Int>,
     override var name: String = ""
-) : Layer() {
+) : SingleInputLayer() {
     private lateinit var units: Constant<Int>
 
     override fun build(tf: Ops, inputShape: Shape) {

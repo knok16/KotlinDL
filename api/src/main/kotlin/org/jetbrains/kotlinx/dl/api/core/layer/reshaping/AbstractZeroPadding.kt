@@ -6,13 +6,14 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
 import org.tensorflow.op.Ops
 
 /**
  * Abstract Zero Padding layer used as the base layer for all the ZeroPadding layers.
  */
-public abstract class AbstractZeroPadding : Layer() {
+public abstract class AbstractZeroPadding : SingleInputLayer() {
 
     override fun forward(
         tf: Ops,

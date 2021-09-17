@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.MultipleInputsLayer
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -18,28 +19,12 @@ import org.tensorflow.op.Ops
  *
  * @property [layerTypeName] Specified layer name used for tf operation alias building.
  */
-public abstract class AbstractMerge(public val layerTypeName: String) : Layer() {
-    override fun build(tf: Ops, inputShape: Shape) {
+public abstract class AbstractMerge(public val layerTypeName: String) : MultipleInputsLayer() {
+    override fun build(tf: Ops, inputShapes: List<Shape>) {}
 
-    }
-
-    override fun computeOutputShape(inputShape: Shape): Shape {
-        throw UnsupportedOperationException("This layer is not supported for Sequential model!")
-    }
-
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        checkInputShapesOfInboundLayers() //TODO: crash efficientNet models
-        outputShape = inboundLayers[0].outputShape.clone()
-        return outputShape
-    }
-
-    override fun forward(
-        tf: Ops,
-        input: Operand<Float>,
-        isTraining: Operand<Boolean>,
-        numberOfLosses: Operand<Float>?
-    ): Operand<Float> {
-        return input
+    override fun computeOutputShape(inputShapes: List<Shape>): Shape {
+        checkInputShapesOfInboundLayers(inputShapes) //TODO: crash efficientNet models
+        return inputShapes[0]
     }
 
     override fun forward(
@@ -74,14 +59,11 @@ public abstract class AbstractMerge(public val layerTypeName: String) : Layer() 
         }
     }
 
-    private fun checkInputShapesOfInboundLayers() {
-        val firstInputShape = inboundLayers[0].outputShape
+    private fun checkInputShapesOfInboundLayers(inputShapes: List<Shape>) {
+        val firstInputShape = TensorShape(inputShapes[0])
 
-        for (layer in inboundLayers) {
-            val tensorShape = layer.outputShape
-            require(
-                firstInputShape == tensorShape
-            ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
+        for (tensorShape in inputShapes) {
+            require(firstInputShape == TensorShape(tensorShape)) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape " }
         }
     }
 }

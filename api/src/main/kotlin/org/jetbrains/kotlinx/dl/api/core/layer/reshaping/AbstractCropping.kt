@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.SingleInputLayer
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -18,7 +19,7 @@ import org.tensorflow.op.Ops
  */
 public abstract class AbstractCropping(
     public val croppingInternal: Array<IntArray>
-) : Layer() {
+) : SingleInputLayer() {
 
     override fun build(tf: Ops, inputShape: Shape) {}
 
