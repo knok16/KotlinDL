@@ -33,16 +33,10 @@ public sealed class Layer {
     protected var fanOut: Int = Int.MIN_VALUE
 
     /** Returns inbound layers. */
-    public var inboundLayers: MutableList<Layer> = mutableListOf()
+    public var inboundLayers: List<Layer> = emptyList()
 
     /** Returns outbound layers. */
     public var outboundLayers: MutableList<Layer> = mutableListOf()
-
-    /** Important part of functional API. It takes [layers] as input and saves them to the [inboundLayers] of the given layer. */
-    public operator fun invoke(vararg layers: Layer): Layer {
-        inboundLayers = layers.toMutableList()
-        return this
-    }
 }
 
 public data class OperandWithShape(
@@ -73,6 +67,12 @@ public abstract class SingleInputLayer : Layer() {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): OperandWithShape
+
+    /** Important part of functional API. It takes [layer] as input and saves them to the [inboundLayers] of the given layer. */
+    public operator fun invoke(layer: Layer): Layer {
+        inboundLayers = listOf(layer)
+        return this
+    }
 }
 
 public abstract class MultipleInputsLayer : Layer() {
@@ -85,6 +85,12 @@ public abstract class MultipleInputsLayer : Layer() {
         isTraining: Operand<Boolean>,
         numberOfLosses: Operand<Float>?
     ): OperandWithShape
+
+    /** Important part of functional API. It takes layers as input and saves them to the [inboundLayers] of the given layer. */
+    public operator fun invoke(layer1: Layer, layer2: Layer, vararg otherLayers: Layer): Layer {
+        inboundLayers = listOf(layer1, layer2, *otherLayers)
+        return this
+    }
 }
 
 internal fun requireArraySize(array: LongArray, size: Int, name: String) =
