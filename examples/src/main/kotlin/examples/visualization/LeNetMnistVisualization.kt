@@ -58,16 +58,17 @@ fun main() {
         val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
         println("Accuracy $accuracy")
 
-        val fstConv2D = it.layers[1] as Conv2D
-        val sndConv2D = it.layers[3] as Conv2D
+        val weights = it.weights
+        val fstConv2D = weights["conv2d_1_conv2d_kernel"] as Array<*>
+        val sndConv2D = weights["conv2d_3_conv2d_kernel"] as Array<*>
 
         // lets-plot approach
         filtersPlot(fstConv2D, columns = 16).show()
         filtersPlot(sndConv2D, columns = 16).show()
 
         // swing approach
-        drawFilters(fstConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
-        drawFilters(sndConv2D.weights.values.toTypedArray()[0], colorCoefficient = 10.0)
+        drawFilters(fstConv2D, colorCoefficient = 10.0)
+        drawFilters(sndConv2D, colorCoefficient = 10.0)
 
         val layersActivations = modelActivationOnLayersPlot(it, x)
         val (prediction, activations) = it.predictAndGetActivations(x)

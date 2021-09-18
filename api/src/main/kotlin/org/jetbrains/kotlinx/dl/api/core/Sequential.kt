@@ -173,10 +173,7 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
                 metric = this.metric
             )
 
-            deserializedModel.layers.forEach {
-                it.weights = this.getLayer(it.name).weights
-            }
-
+            deserializedModel.weights = this.weights
             deserializedModel.isModelInitialized = true
 
             return deserializedModel

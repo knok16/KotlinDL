@@ -133,10 +133,6 @@ public abstract class AbstractConv(
     /** Returns the shape of bias weights. */
     public val biasShapeArray: LongArray? get() = bias?.let { TensorShape(it.shape).dims() }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractConvWeights()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = true
 
     /** Define the number of output channels given the number of input channels.
@@ -178,9 +174,6 @@ public abstract class AbstractConv(
      * @return the defined output shape that is saved in class variable and returned by [computeOutputShape]]
      */
     protected abstract fun defineOutputShape(inputShape: Shape): Shape
-
-    /** Extract weights of the layer with the names from [defineVariableNames]. */
-    private fun extractConvWeights(): Map<String, Array<*>> = extractWeights(variables.map { it.name })
 
     /** Create the names of variables of the layer based on layer name or not if not present. */
     private val kernelVariableName: String

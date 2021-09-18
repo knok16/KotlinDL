@@ -86,10 +86,6 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         }
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean
         get() = false
 }

@@ -77,8 +77,8 @@ fun sineRegression() {
 
         println("evaluationResult: $evaluationResult")
 
-        println("Weights: " + it.getLayer("dense_3").weights["dense_3_dense_kernel"].contentDeepToString())
-        println("Bias: " + it.getLayer("dense_3").weights["dense_3_dense_bias"].contentDeepToString())
+        println("Weights: " + it.weights["dense_3_dense_kernel"].contentDeepToString())
+        println("Bias: " + it.weights["dense_3_dense_bias"].contentDeepToString())
 
         repeat(100) { id ->
             val xReal = test.getX(id)

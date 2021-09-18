@@ -16,20 +16,20 @@ internal val ACTIVATION_LAYERS_PERMUTATION = intArrayOf(2, 1, 0, 3)
 /**
  * Create a column plot of tile plots for weights of Conv2D layer filters.
  *
- * @param conv2DLayer which weights will be changed to tile plot
+ * @param weights weights will be changed to tile plot
  * @param plotFeature filling colors of the created plot
  * @param imageSize size of width and height of single plot in px
  * @param columns number of columns in which the single filters plots are arranged
  * @return a figure representing the weights plots
  */
 fun filtersPlot(
-    conv2DLayer: Conv2D,
+    weights: Array<*>,
     plotFeature: PlotFeature = PlotFeature.GRAY,
     imageSize: Int = 64,
     columns: Int = 8
 ): Figure {
     @Suppress("UNCHECKED_CAST")
-    val weights = conv2DLayer.weights.values.toTypedArray()[0] as TensorImageData
+    val weights = weights as TensorImageData
 
     val xyInOut = extractXYInputOutputAxeSizes(weights, FILTER_LAYERS_PERMUTATION)
 

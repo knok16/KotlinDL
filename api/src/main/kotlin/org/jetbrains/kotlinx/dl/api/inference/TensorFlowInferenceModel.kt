@@ -8,6 +8,7 @@ package org.jetbrains.kotlinx.dl.api.inference
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
 import org.jetbrains.kotlinx.dl.api.core.layer.frozenLayerVariables
 import org.jetbrains.kotlinx.dl.api.core.layer.layersVariables
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
@@ -95,6 +96,25 @@ public open class TensorFlowInferenceModel : InferenceModel() {
 
     override val inputDimensions: LongArray
         get() = TODO("Not yet implemented")
+
+    /**
+     *  Layer's weights
+     *  Require parent model to be set on layer
+     */
+    public var weights: Map<String, Array<*>>
+        get() {
+            val variablesOrder = layersVariables()
+            val runner = session.runner()
+            variablesOrder.map { it.variable }.forEach(runner::fetch)
+            val weights = runner.run().map { it.convertTensorToMultiDimArray() }
+
+            return variablesOrder.map { it.name }.zip(weights).toMap()
+        }
+        set(weights) {
+            for ((name, value) in weights) {
+                assignVariable(name, value)
+            }
+        }
 
     /**
      * Generates output prediction for the input sample.

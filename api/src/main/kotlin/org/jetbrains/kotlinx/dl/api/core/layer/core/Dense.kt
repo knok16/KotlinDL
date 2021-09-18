@@ -6,7 +6,6 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.core
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
@@ -97,12 +96,6 @@ public class Dense(
         val signal = bias?.let { tf.math.add(matMul, it.variable) } ?: matMul
         return Activations.convert(activation).apply(tf, signal, name)
     }
-
-    override var weights: Map<String, Array<*>>
-        get() = extractDenseWeights()
-        set(value) = assignWeights(value)
-
-    private fun extractDenseWeights(): Map<String, Array<*>> = extractWeights(variables.map { it.name })
 
     override val hasActivation: Boolean get() = true
 

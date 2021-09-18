@@ -89,13 +89,13 @@ internal class RegressionTest {
                 assert(mae < 0.2)
             }
 
-            val weights = it.getLayer("dense_2").weights["dense_2_dense_kernel"]
+            val weights = it.weights["dense_2_dense_kernel"]
             assert((weights?.get(0) as FloatArray)[0] > 0.8f && (weights[0] as FloatArray)[0] < 1.2f)
             assert((weights[1] as FloatArray)[0] > -2.2f && (weights[1] as FloatArray)[0] < -1.8f)
             assert((weights[2] as FloatArray)[0] > 1.4f && (weights[2] as FloatArray)[0] < 1.6f)
             assert((weights[3] as FloatArray)[0] > -1.1f && (weights[3] as FloatArray)[0] < -0.8f)
 
-            val bias = it.getLayer("dense_2").weights["dense_2_dense_bias"]
+            val bias = it.weights["dense_2_dense_bias"]
             assert((bias!![0] as Float) > 0.05f && (bias[0] as Float) < 0.4f)
 
             var simpleMae = 0.0f

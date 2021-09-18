@@ -104,10 +104,6 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             } else {
                 layersByName = layersByName + (layer.name to layer)
             }
-
-            if (layer.parentModel != null) logger.warn { "Layer ${layer.name} is a part of model ${layer.parentModel}" }
-
-            layer.parentModel = this
         }
 
 

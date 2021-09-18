@@ -245,13 +245,13 @@ internal class SequentialBasicTest : IntegrationTest() {
 
             copiedModel = it.copy(copyWeights = true)
 
-            copiedModel.layers.forEach { layer ->
-                run {
-                    val weights = copiedModel.getLayer(layer.name).weights
-                    weights.forEach { (varName, arr) ->
-                        assertArrayEquals(arr, it.getLayer(layer.name).weights[varName]) //arr.contentDeepEquals()
-                    }
-                }
+            val originalWeights = it.weights
+            val copiedWeights = copiedModel.weights
+
+            assertEquals(originalWeights.keys, copiedWeights.keys)
+
+            originalWeights.forEach { (name, weights) ->
+                assertArrayEquals(originalWeights[name], weights) //arr.contentDeepEquals()
             }
         }
 

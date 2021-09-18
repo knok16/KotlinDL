@@ -195,14 +195,6 @@ public class SeparableConv2D(
         return Activations.convert(activation).apply(tf, output, name)
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractDepthConv2DWeights()
-        set(value) = assignWeights(value)
-
-    private fun extractDepthConv2DWeights(): Map<String, Array<*>> {
-        return extractWeights(variables.map { it.name })
-    }
-
     /** Returns the shape of kernel weights. */
     public val depthwiseShapeArray: LongArray get() = TensorShape(depthwiseKernel.shape).dims()
 

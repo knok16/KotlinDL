@@ -138,12 +138,6 @@ public class BatchNorm(
         else xNorm
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = extractBatchNormWeights()
-        set(value) = assignWeights(value)
-
-    private fun extractBatchNormWeights(): Map<String, Array<*>> = extractWeights(variables.map { it.name })
-
     override val hasActivation: Boolean get() = false
 
     /** Returns the shape of gamma variable weights. */

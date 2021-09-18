@@ -107,8 +107,8 @@ fun linearRegression() {
         }
 
         val mae = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.MAE]
-        println("Weights: " + it.getLayer("dense_2").weights["dense_2_dense_kernel"].contentDeepToString())
-        println("Bias: " + it.getLayer("dense_2").weights["dense_2_dense_bias"].contentDeepToString())
+        println("Weights: " + it.weights["dense_2_dense_kernel"].contentDeepToString())
+        println("Bias: " + it.weights["dense_2_dense_bias"].contentDeepToString())
         println("MAE: $mae")
 
         repeat(100) { id ->

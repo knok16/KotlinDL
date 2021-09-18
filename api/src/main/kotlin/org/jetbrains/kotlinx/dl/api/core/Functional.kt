@@ -5,11 +5,8 @@
 
 package org.jetbrains.kotlinx.dl.api.core
 
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.ParametrizedLayer
-import org.jetbrains.kotlinx.dl.api.core.layer.TrainableLayer
+import org.jetbrains.kotlinx.dl.api.core.layer.*
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.paramCount
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
@@ -339,10 +336,7 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
                 metric = this.metric
             )
 
-            deserializedModel.layers.forEach {
-                it.weights = this.getLayer(it.name).weights
-            }
-
+            deserializedModel.weights = this.weights
             deserializedModel.isModelInitialized = true
 
             return deserializedModel

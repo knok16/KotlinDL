@@ -64,10 +64,6 @@ public class MaxPool2D(
         )
     }
 
-    override var weights: Map<String, Array<*>>
-        get() = emptyMap()
-        set(value) = assignWeights(value)
-
     override val hasActivation: Boolean get() = false
 
     override fun toString(): String {
