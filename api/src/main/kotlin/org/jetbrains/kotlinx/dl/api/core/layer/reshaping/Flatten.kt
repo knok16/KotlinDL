@@ -34,9 +34,6 @@ public class Flatten(override var name: String = "") : SingleInputLayer() {
         val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
         units = tf.constant(intArrayOf(-1, amountOfNeuronsInFlattenLayer))
 
-        fanIn = tensorShape.numElements().toInt()
-        fanOut = amountOfNeuronsInFlattenLayer
-
         return OperandWithShape(
             tf.reshape(input.operand, units),
             computeOutputShape(input.shape)

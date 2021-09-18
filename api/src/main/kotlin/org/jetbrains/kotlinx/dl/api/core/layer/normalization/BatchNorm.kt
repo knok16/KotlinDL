@@ -72,6 +72,9 @@ public class BatchNorm(
 
         if (name.isEmpty()) throw RuntimeException("Cannot build BatchNorm layer, because of empty name")
 
+        val fanIn = Int.MIN_VALUE
+        val fanOut = Int.MIN_VALUE
+
         val movingMeanVariableName = batchNormMovingMeanVarName(name)
         movingMean = variable(tf, movingMeanVariableName, weightShape, fanIn, fanOut, movingMeanInitializer, null)
 

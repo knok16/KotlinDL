@@ -60,9 +60,6 @@ public class Reshape(
             else -> throw UnsupportedOperationException("Reshaping for ${targetShape.size} is not supported yet!")
         }
 
-        fanIn = tensorShape.numElements().toInt()
-        fanOut = amountOfNeuronsInFlattenLayer
-
         return OperandWithShape(
             tf.reshape(input.operand, units),
             computeOutputShape(input.shape)

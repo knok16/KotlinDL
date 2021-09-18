@@ -107,10 +107,10 @@ public class SeparableConv2D(
         val inputDepth = numberOfChannels // amount of channels
         val outputDepth = numberOfChannels * this.depthMultiplier // amount of channels for the next layer
 
-        fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
-        fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
+        val fanIn = (inputDepth * kernelSize[0] * kernelSize[1]).toInt()
+        val fanOut = ((outputDepth * kernelSize[0] * kernelSize[1] / (strides[0].toDouble() * strides[1])).roundToInt())
 
-        createSeparableConv2DVariables(tf, numberOfChannels)
+        createSeparableConv2DVariables(tf, numberOfChannels, fanIn, fanOut)
 
         return OperandWithShape(
             forward(tf, input.operand),
@@ -127,7 +127,7 @@ public class SeparableConv2D(
     private val biasVariableName: String
         get() = if (name.isNotEmpty()) separableConv2dBiasVarName(name) else BIAS_VARIABLE_NAME
 
-    private fun createSeparableConv2DVariables(tf: Ops, numberOfChannels: Long) {
+    private fun createSeparableConv2DVariables(tf: Ops, numberOfChannels: Long, fanIn: Int, fanOut: Int) {
         val depthwiseKernelShape = shapeFromDims(*kernelSize, numberOfChannels, this.depthMultiplier.toLong())
         depthwiseKernel = variable(
             tf,

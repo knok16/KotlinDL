@@ -60,8 +60,8 @@ public class PReLU(
             }
         }
 
-        fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
-        fanOut = fanIn
+        val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
+        val fanOut = fanIn
 
         val alphaShape = Shape.make(alphaShapeArray[0], *alphaShapeArray.drop(1).toLongArray())
         alpha = variable(tf, alphaVariableName, alphaShape, fanIn, fanOut, alphaInitializer, alphaRegularizer)

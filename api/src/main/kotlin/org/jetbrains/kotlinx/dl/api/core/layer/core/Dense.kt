@@ -69,8 +69,8 @@ public class Dense(
         numberOfLosses: Operand<Float>?
     ): OperandWithShape {
         val inputShape = input.shape
-        fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
-        fanOut = outputSize
+        val fanIn = inputShape.size(inputShape.numDimensions() - 1).toInt()
+        val fanOut = outputSize
 
         val kernelShape = Shape.make(inputShape.size(inputShape.numDimensions() - 1), outputSize.toLong())
         kernel = variable(tf, kernelVariableName, kernelShape, fanIn, fanOut, kernelInitializer, kernelRegularizer)

@@ -83,8 +83,8 @@ public abstract class AbstractConv(
         // should be calculated before addWeight because it's used in calculation
         val inputDepth = numberOfChannels // number of input channels
         val outputDepth = getOutputDepth(numberOfChannels) // number of output channels
-        fanIn = (inputDepth * multiply(kernelSizeInternal)).toInt()
-        fanOut = ((outputDepth * multiply(kernelSizeInternal)).toDouble() /
+        val fanIn = (inputDepth * multiply(kernelSizeInternal)).toInt()
+        val fanOut = ((outputDepth * multiply(kernelSizeInternal)).toDouble() /
                 multiply(stridesInternal).toDouble()).roundToInt()
 
         val kernelShape = computeKernelShape(numberOfChannels)
