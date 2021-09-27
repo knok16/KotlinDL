@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.inference
 
 import mu.KotlinLogging
 import org.jetbrains.kotlinx.dl.api.core.KGraph
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.jetbrains.kotlinx.dl.api.inference.savedmodel.Input
@@ -151,7 +151,7 @@ public open class TensorFlowInferenceModel : InferenceModel() {
     }
 
     override fun reshape(vararg dims: Long) {
-        this.shape = TensorShape(1, *dims).dims()
+        this.shape = longArrayOf(1, *dims)
     }
 
     /** Forms the graph description in string format. */
@@ -336,14 +336,13 @@ public open class TensorFlowInferenceModel : InferenceModel() {
             check(assignOp != null) { "Operation $assignOp is not found in static graph." }
 
             val shape = operation.output<Float>(0).shape()
-            val tensorShape = TensorShape(shape)
 
             val source = createFloatArrayFromScanner(shape, scanner)
             populateVariable(initializerName, source, assignOpName)
 
             logger.debug { "Loading the variable $variableName data" }
-            logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-            logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+            logger.debug { "Variable dimensions are: $shape" }
+            logger.debug { "Amount of elements: ${shape.numElements()}" }
         }
     }
 
@@ -376,13 +375,12 @@ public open class TensorFlowInferenceModel : InferenceModel() {
         check(assignOp != null) { "Operation $assignOp is not found in static graph." }
 
         val shape = operation.output<Float>(0).shape()
-        val tensorShape = TensorShape(shape)
 
         populateVariable(initializerName, data, assignOpName, session)
 
         logger.debug { "Loading the variable $variableName data" }
-        logger.debug { "Variable dimensions are: ${tensorShape.dims().contentToString()}" }
-        logger.debug { "Amount of elements: ${tensorShape.numElements()}" }
+        logger.debug { "Variable dimensions are: $shape" }
+        logger.debug { "Amount of elements: ${shape.numElements()}" }
     }
 
     private fun loadModelFromSimpleFormat(pathToModelDirectory: String, loadOptimizerState: Boolean) {

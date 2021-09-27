@@ -9,7 +9,6 @@ import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.TrainableModel
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -29,7 +28,7 @@ public abstract class Layer(public var name: String) {
     public var isTrainable: Boolean = true
 
     /** Output data tensor shape. */
-    public lateinit var outputShape: TensorShape
+    public lateinit var outputShape: Shape
 
     /** Model where this layer is used. */
     public var parentModel: TrainableModel? = null
@@ -67,7 +66,7 @@ public abstract class Layer(public var name: String) {
      */
     public fun buildFromInboundLayers(tf: Ops, kGraph: KGraph) {
         require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        build(tf, kGraph, inboundLayers[0].outputShape.toShape())
+        build(tf, kGraph, inboundLayers[0].outputShape)
     }
 
     /**
@@ -81,9 +80,9 @@ public abstract class Layer(public var name: String) {
      * NOTE: This function should be overridden for layers with multiple inputs.
      * NOTE: Used in Functional API
      */
-    public open fun computeOutputShapeFromInboundLayers(): TensorShape {
+    public open fun computeOutputShapeFromInboundLayers(): Shape {
         require(inboundLayers.isNotEmpty()) { "There is no inbound layers to compute output shape" }
-        return TensorShape(computeOutputShape(inboundLayers[0].outputShape.toShape()))
+        return computeOutputShape(inboundLayers[0].outputShape)
     }
 
     /**

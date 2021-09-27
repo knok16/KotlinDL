@@ -8,86 +8,83 @@ package org.jetbrains.kotlinx.dl.api.core.shape
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
-import kotlin.math.abs
 
 /**
- * Creates constant array.
+ * Creates shape [Shape] from [LongArray].
  */
-internal fun constArray(tf: Ops, vararg data: Int): Operand<Int> {
-    return tf.constant(data)
+public fun shape(dims: LongArray?): Shape = when {
+    dims == null -> Shape.unknown()
+    dims.isEmpty() -> Shape.scalar()
+    else -> Shape.make(dims[0], *dims.copyOfRange(1, dims.size))
 }
 
-/** Creates shape [Operand] from [Shape]. */
-internal fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> {
-    val shapeArray = IntArray(shape.numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = shape.size(i).toInt()
-    }
-    return tf.constant(shapeArray)
+/**
+ * Creates shape [Operand] from [Shape].
+ */
+internal fun shapeOperand(tf: Ops, shape: Shape): Operand<Int> =
+    tf.constant(shape.toIntArray())
+
+/**
+ * Extracts dimensions as [IntArray] from [Shape].
+ */
+internal fun Shape.toIntArray(): IntArray =
+    IntArray(numDimensions()) { size(it).toInt() }
+
+/**
+ * Extracts dimensions as [LongArray] from [Shape].
+ */
+public fun Shape.toLongArray(): LongArray =
+    LongArray(numDimensions()) { size(it) }
+
+/**
+ * Returns the value of a dimension
+ *
+ * @param i The index at which to retrieve a dimension.
+ * @return The size of dimension i
+ */
+public operator fun Shape.get(i: Int): Long =
+    size(i)
+
+/**
+ * Returns amount of elements in Tensor with the given shape.
+ * Negative dimensions are ignored.
+ */
+public fun Shape.numElements(): Long =
+    (0 until numDimensions()).asSequence().map(::size).filter { it >= 0 }.fold(1L, Long::times)
+
+/**
+ * Test whether dimension i in this shape is known
+ *
+ * @param [i] Target dimension to test
+ * @return Whether dimension [i] is unknown (equal to -1)
+ */
+private fun Shape.isKnown(i: Int): Boolean {
+    return this[i] != -1L
 }
 
-/** Extracts dimensions as [IntArray] from [Shape]. */
-internal fun Shape.toIntArray(): IntArray {
-    val shapeArray = IntArray(numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = size(i).toInt()
-    }
-    return shapeArray
-}
+/**
+ * Throw an exception if dimension [i] is unknown.
+ *
+ * @param [i] Target dimension to test
+ * @throws IllegalStateException if dimension [i] is unknown
+ */
+public fun Shape.assertKnown(i: Int): Unit =
+    check(isKnown(i)) { "Dimension $i in shape needs to be known." }
 
-/** Extracts dimensions as [LongArray] from [Shape]. */
-internal fun Shape.toLongArray(): LongArray {
-    val shapeArray = LongArray(numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = size(i)
-    }
-    return shapeArray
-}
+/**
+ * Returns the head dimension.
+ */
+public val Shape.head: Long
+    get() = get(0)
 
-/** Extracts dimensions as [String] from [shape]. */
-internal fun shapeArrayToString(shape: Shape): String {
-    val shapeArray = IntArray(shape.numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = shape.size(i).toInt()
-    }
-    return shapeArray.contentToString()
-}
+/**
+ * Returns the tail dimensions.
+ */
+public val Shape.tail: LongArray
+    get() = toLongArray().copyOfRange(1, numDimensions())
 
-/** Returns first dimension from all dimensions [dims]. */
-internal fun head(vararg dims: Long): Long {
-    return dims[0]
-}
-
-/** Returns last dimensions (except first) from [dims]. */
-internal fun tail(vararg dims: Long): LongArray {
-    return dims.copyOfRange(1, dims.size)
-}
-
-/** Returns last dimensions (except first) from [shape]. */
-public fun tail(shape: Shape): LongArray {
-    val shapeArray = LongArray(shape.numDimensions())
-    for (i in shapeArray.indices) {
-        shapeArray[i] = shape.size(i)
-    }
-    return tail(*shapeArray)
-}
-
-/** Creates [Shape] object from a few [Long] values in [dims]. */
-internal fun shapeFromDims(vararg dims: Long): Shape {
-    return Shape.make(head(*dims), *tail(*dims))
-}
-
-/** Returns amount of elements in Tensor with [shape]. */
-internal fun numElementsInShape(shape: LongArray): Long {
-    var prod = 1L
-    for (i in shape.indices) {
-        prod *= abs(shape[i])
-    }
-    return prod
-}
-
-/** Returns amount of elements in [Shape]. */
-internal fun Shape.numElements(): Long = numElementsInShape(toLongArray())
+public fun Shape.isCompatible(shape: Shape): Boolean =
+    this.numDimensions() == shape.numDimensions() && (0 until this.numDimensions()).all { this[it] == shape[it] }
 
 /** Reshapes 2D array of floats to 1D array of floats. */
 public fun reshape2DTo1D(dst: Array<FloatArray>, size: Int): FloatArray {
@@ -165,7 +162,7 @@ internal fun getShapeOfArray(data: Array<*>): Shape {
             else -> acc.toLongArray()
         }
     }
-    return shapeFromDims(*collectDims(data, mutableListOf()))
+    return shape(collectDims(data, mutableListOf()))
 }
 
 /** Shape property of standard JVM array for better readability of code */

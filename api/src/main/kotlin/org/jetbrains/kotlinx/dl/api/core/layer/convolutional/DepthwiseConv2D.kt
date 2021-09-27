@@ -13,7 +13,7 @@ import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.depthwiseConv2dKernelVarName
 import org.tensorflow.Operand
@@ -93,7 +93,7 @@ public class DepthwiseConv2D(
     }
 
     protected override fun computeKernelShape(numberOfChannels: Long): Shape =
-        shapeFromDims(*kernelSize, numberOfChannels, depthMultiplier.toLong())
+        shape(kernelSize + numberOfChannels + depthMultiplier.toLong())
 
     protected override fun computeBiasShape(numberOfChannels: Long): Shape =
         Shape.make(numberOfChannels * depthMultiplier)

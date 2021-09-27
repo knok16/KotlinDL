@@ -14,10 +14,10 @@ import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.layer.requireArraySize
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.convOutputLength
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.separableConv2dDepthwiseKernelVarName
@@ -107,8 +107,8 @@ public class SeparableConv2D(
         val numberOfChannels = inputShape.size(inputShape.numDimensions() - 1)
 
         // Compute shapes of kernel and bias matrices
-        depthwiseKernelShape = shapeFromDims(*kernelSize, numberOfChannels, this.depthMultiplier.toLong())
-        pointwiseKernelShape = shapeFromDims(1, 1, numberOfChannels * this.depthMultiplier, filters)
+        depthwiseKernelShape = shape(kernelSize + numberOfChannels + depthMultiplier.toLong())
+        pointwiseKernelShape = Shape.make(1, 1, numberOfChannels * this.depthMultiplier, filters)
         if (useBias) biasShape = Shape.make(filters)
 
         // should be calculated before addWeight because it's used in calculation, need to rewrite addWEight to avoid strange behaviour
@@ -173,9 +173,8 @@ public class SeparableConv2D(
             strides[2].toInt(), dilations[2].toInt()
         )
 
-        val shape = Shape.make(inputShape.size(0), rows, cols, filters)
-        outputShape = TensorShape(shape)
-        return shape
+        outputShape = Shape.make(inputShape.size(0), rows, cols, filters)
+        return outputShape
     }
 
     override fun forward(
@@ -227,13 +226,13 @@ public class SeparableConv2D(
     }
 
     /** Returns the shape of kernel weights. */
-    public val depthwiseShapeArray: LongArray get() = TensorShape(depthwiseKernelShape).dims()
+    public val depthwiseShapeArray: LongArray get() = depthwiseKernelShape.toLongArray()
 
     /** Returns the shape of kernel weights. */
-    public val pointwiseShapeArray: LongArray get() = TensorShape(pointwiseKernelShape).dims()
+    public val pointwiseShapeArray: LongArray get() = pointwiseKernelShape.toLongArray()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
+    public val biasShapeArray: LongArray? get() = biasShape?.toLongArray()
 
     override val hasActivation: Boolean get() = true
 

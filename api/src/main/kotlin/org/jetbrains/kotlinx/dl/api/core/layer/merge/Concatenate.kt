@@ -6,8 +6,10 @@
 package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.get
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.tensorflow.Operand
+import org.tensorflow.Shape
 import org.tensorflow.op.Ops
 
 /**
@@ -19,43 +21,46 @@ import org.tensorflow.op.Ops
  * @property [axis] Axis along which to concatenate.
  */
 public class Concatenate(
-    public var axis: Int = 3,
+    public var axis: Int,
     name: String = ""
 ) : AbstractMerge("ConcatenateLayer", name), NoGradients {
     init {
         isTrainable = false
     }
 
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
-        val inputShapes = mutableListOf<TensorShape>()
-        inboundLayers.forEach { inboundLayer -> inputShapes.add(inboundLayer.outputShape) }
-        val newShape = inputShapes[0].clone()
+    override fun computeOutputShapeFromInboundLayers(): Shape {
+        val inputShapes = inboundLayers.map { it.outputShape }
 
-        var axe = axis
-        if (axis == -1) { // it influences on nasmobilemodel
-            val rank: Int = inputShapes[0].rank()
-            axe = (rank + axis) // to make axe positive
+        val firstShape = inputShapes[0]
+
+        val axisToConcatenateAlong = if (axis == -1) { // it influences on nasmobilemodel
+            firstShape.numDimensions() - 1 // concatenate along last axis if axis is not specified
+        } else {
+            axis
         }
 
-
-        newShape[axe] = inputShapes.sumOf { it[axe] } // concatenated dimension
-
-        val tensorShape = newShape.clone()
-        outputShape = tensorShape
-        return tensorShape
+        outputShape = shape(LongArray(firstShape.numDimensions()) { i ->
+            if (i == axisToConcatenateAlong) {
+                inputShapes.sumOf { it[axisToConcatenateAlong] } // concatenated dimension
+            } else {
+                firstShape[i]
+            }
+        })
+        return outputShape
     }
 
     override fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
         require(input.size > 1) { "The number of input layers should be more than 1." }
 
-        val firstInputShape = TensorShape(input[0].asOutput().shape())
+        val firstInputShape = input[0].asOutput().shape()
 
         for (layer in input) {
-            val tensorShape = TensorShape(
-                layer.asOutput().shape()
-            )
+            val tensorShape = layer.asOutput().shape()
             require(
-                firstInputShape.almostEqual(tensorShape, except = axis)
+                (0 until firstInputShape.numDimensions())
+                    .asSequence()
+                    .filterNot { it == axis }
+                    .all { firstInputShape[it] == tensorShape[it] }
             ) {
                 "A Concatenate layer requires inputs with matching shapes except for the concat axis. " +
                         "But shapes are the following: shape of first input is $firstInputShape and shape of layer $layer is $tensorShape."

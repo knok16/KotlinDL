@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.deserializeSequentialModel
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSequentialModelLayers
 import org.jetbrains.kotlinx.dl.api.inference.keras.loadSerializedModel
@@ -135,18 +135,15 @@ public class Sequential(vararg layers: Layer) : GraphTrainableModel(*layers) {
             it.build(tf, kGraph, inputShape)
 
             inputShape = it.computeOutputShape(inputShape)
-            val tensorShape = TensorShape(inputShape)
-            val dims = tensorShape.dims()
 
-            check(tensorShape.tail().all { elem -> elem > 0 })
-            {
-                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
+            check(inputShape.tail.all { elem -> elem > 0 }) {
+                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: $inputShape.\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 
-            it.outputShape = tensorShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
+            it.outputShape = inputShape //TODO: Refactoring: it could be done inside computeOutputShapeMethods
 
-            logger.debug { "${it.name}; $it; outputShape: $tensorShape" }
+            logger.debug { "${it.name}; $it; outputShape: ${it.outputShape}" }
         }
     }
 

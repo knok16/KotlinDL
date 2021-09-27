@@ -7,7 +7,8 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.head
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -34,8 +35,7 @@ public class Reshape(
     private lateinit var units: Constant<Int>
 
     override fun build(tf: Ops, kGraph: KGraph, inputShape: Shape) {
-        val tensorShape = TensorShape(inputShape)
-        val amountOfNeuronsInFlattenLayer = (tensorShape.numElements() / abs(tensorShape.size(0))).toInt()
+        val amountOfNeuronsInFlattenLayer = (inputShape.numElements() / abs(inputShape.size(0))).toInt()
         units = when (targetShape.size) {
             1 -> tf.constant(intArrayOf(-1, targetShape[0]))
             2 -> tf.constant(intArrayOf(-1, targetShape[0], targetShape[1]))
@@ -54,26 +54,25 @@ public class Reshape(
             else -> throw UnsupportedOperationException("Reshaping for ${targetShape.size} is not supported yet!")
         }
 
-        fanIn = tensorShape.numElements().toInt()
+        fanIn = inputShape.numElements().toInt()
         fanOut = amountOfNeuronsInFlattenLayer
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         // leaves unknown dimensions unknown
-        val tensorShape = TensorShape(inputShape)
         return when (targetShape.size) {
             3 -> Shape.make(
-                tensorShape.head(),
+                inputShape.head,
                 targetShape[0].toLong(),
                 targetShape[1].toLong(),
                 targetShape[2].toLong()
             )
             2 -> Shape.make(
-                tensorShape.head(),
+                inputShape.head,
                 targetShape[0].toLong(),
                 targetShape[1].toLong(),
             )
-            1 -> Shape.make(tensorShape.head(), targetShape[0].toLong())
+            1 -> Shape.make(inputShape.head, targetShape[0].toLong())
             else -> throw UnsupportedOperationException("Input shape with ${targetShape.size} dimensions is not supported.")
         }
     }

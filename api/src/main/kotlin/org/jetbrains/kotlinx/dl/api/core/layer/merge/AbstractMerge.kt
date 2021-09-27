@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.merge
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.isCompatible
 import org.tensorflow.Operand
 import org.tensorflow.Shape
 import org.tensorflow.op.Ops
@@ -28,9 +28,9 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         throw UnsupportedOperationException("This layer is not supported for Sequential model!")
     }
 
-    override fun computeOutputShapeFromInboundLayers(): TensorShape {
+    override fun computeOutputShapeFromInboundLayers(): Shape {
         checkInputShapesOfInboundLayers() //TODO: crash efficientNet models
-        outputShape = inboundLayers[0].outputShape.clone()
+        outputShape = inboundLayers[0].outputShape
         return outputShape
     }
 
@@ -63,14 +63,12 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
     protected open fun checkInputShapesOfInputOperands(input: List<Operand<Float>>) {
         require(input.size > 1) { "The number of input layers should be more than 1." }
 
-        val firstInputShape = TensorShape(input[0].asOutput().shape())
+        val firstInputShape = input[0].asOutput().shape()
 
         for (layer in input) {
-            val tensorShape = TensorShape(
-                layer.asOutput().shape()
-            )
+            val tensorShape = layer.asOutput().shape()
             require(
-                firstInputShape == tensorShape
+                firstInputShape.isCompatible(tensorShape)
             ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
         }
     }
@@ -81,7 +79,7 @@ public abstract class AbstractMerge(public val layerTypeName: String, name: Stri
         for (layer in inboundLayers) {
             val tensorShape = layer.outputShape
             require(
-                firstInputShape == tensorShape
+                firstInputShape.isCompatible(tensorShape)
             ) { "The shape of first input $firstInputShape should be equal to the shape $tensorShape of $layer " }
         }
     }

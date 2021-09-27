@@ -1,6 +1,7 @@
 package org.jetbrains.kotlinx.dl.api.core.summary
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.isCompatible
+import org.tensorflow.Shape
 
 /**
  * The common information about model.
@@ -30,9 +31,24 @@ public data class LayerSummary(
     /** The layer type. */
     val type: String,
     /** The output shape of the layer. */
-    val outputShape: TensorShape,
+    val outputShape: Shape,
     /** The total number of layer's parameters. */
     val paramsCount: Long,
     /** Input layers for the described layer. */
     val inboundLayers: List<String>
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LayerSummary
+
+        if (name != other.name) return false
+        if (type != other.type) return false
+        if (!outputShape.isCompatible(other.outputShape)) return false
+        if (paramsCount != other.paramsCount) return false
+        if (inboundLayers != other.inboundLayers) return false
+
+        return true
+    }
+}

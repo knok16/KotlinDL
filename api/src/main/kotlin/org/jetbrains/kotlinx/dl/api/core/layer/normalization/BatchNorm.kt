@@ -12,8 +12,8 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Zeros
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.NoGradients
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.util.*
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -177,25 +177,19 @@ public class BatchNorm(
 
     /** Returns the shape of gamma variable weights. */
     public val gammaShapeArray: LongArray?
-        get() {
-            return if (scale) TensorShape(weightShape).dims()
-            else null
-        }
+        get() = weightShape.takeIf { scale }?.toLongArray()
 
     /** Returns the shape of beta variable weights. */
     public val betaShapeArray: LongArray?
-        get() {
-            return if (center) TensorShape(weightShape).dims()
-            else null
-        }
+        get() = weightShape.takeIf { center }?.toLongArray()
 
     /** Returns the shape of movingMean variable weights. */
     public val movingMeanShapeArray: LongArray
-        get() = TensorShape(weightShape).dims()
+        get() = weightShape.toLongArray()
 
     /** Returns the shape of movingVariance variable weights. */
     public val movingVarianceShapeArray: LongArray
-        get() = TensorShape(weightShape).dims()
+        get() = weightShape.toLongArray()
 
     override fun toString(): String {
         return "BatchNorm(axis=$axis, momentum=$momentum, center=$center, epsilon=$epsilon, scale=$scale, gammaInitializer=$gammaInitializer, movingMeanInitializer=$movingMeanInitializer, moving_variance_initializer=$movingVarianceInitializer)"

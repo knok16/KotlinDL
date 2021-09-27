@@ -118,7 +118,7 @@ open class ConvLayerTest {
                     val output = layer.forward(tf, inputOp, isTraining, numberOfLosses).asOutput()
                     kGraph.initializeGraphVariables(session)
                     val outputTensor = session.runner().fetch(output).run().first()
-                    val outputTensorShape = shapeFromDims(*outputTensor.shape())
+                    val outputTensorShape = shape(outputTensor.shape())
                     outputTensor.copyTo(actual)
 
                     assertEquals(expected.shape, outputTensorShape)

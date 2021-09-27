@@ -11,7 +11,6 @@ import ai.onnxruntime.OrtSession
 import ai.onnxruntime.TensorInfo
 import mu.KLogger
 import mu.KotlinLogging
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.extension.argmax
 import org.jetbrains.kotlinx.dl.api.inference.InferenceModel
 import org.jetbrains.kotlinx.dl.api.inference.TensorFlowInferenceModel
@@ -69,11 +68,11 @@ public open class OnnxInferenceModel : InferenceModel() {
 
             val inputDims =
                 (model.session.inputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
-            model.inputShape = TensorShape(1, *inputDims).dims()
+            model.inputShape = longArrayOf(1, *inputDims)
 
             val outputDims =
                 (model.session.outputInfo.toList()[0].second.info as TensorInfo).shape.takeLast(3).toLongArray()
-            model.outputShape = TensorShape(1, *outputDims).dims()
+            model.outputShape = longArrayOf(1, *outputDims)
 
             return model
         }
@@ -85,7 +84,7 @@ public open class OnnxInferenceModel : InferenceModel() {
      * @param dims The input shape.
      */
     public override fun reshape(vararg dims: Long) {
-        this.inputShape = TensorShape(1, *dims).dims()
+        this.inputShape = longArrayOf(1, *dims)
     }
 
     override fun copy(
@@ -97,7 +96,7 @@ public open class OnnxInferenceModel : InferenceModel() {
     }
 
     override val inputDimensions: LongArray
-        get() = TensorShape(inputShape).tail() // TODO: it keeps only 3 numbers
+        get() = inputShape.takeLast(3).toLongArray()
 
     public override fun predict(inputData: FloatArray): Int {
         return predictSoftly(inputData).argmax()

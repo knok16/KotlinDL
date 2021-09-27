@@ -7,6 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core
 
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.shape.tail
 import org.jetbrains.kotlinx.dl.api.inference.keras.*
 import org.tensorflow.Operand
 import java.io.File
@@ -225,11 +226,9 @@ public class Functional(vararg layers: Layer) : GraphTrainableModel(*layers) {
             it.buildFromInboundLayers(tf, kGraph)
 
             val outputShape = it.computeOutputShapeFromInboundLayers()
-            val dims = outputShape.dims()
 
-            check(outputShape.tail().all { elem -> elem > 0 })
-            {
-                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: ${dims.contentToString()}.\n" +
+            check(outputShape.tail.all { elem -> elem > 0 }) {
+                "The last dimensions (except first = -1) of shape of layer ${it.name} contains zero or negative dimension values: $outputShape.\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem."
             }
 

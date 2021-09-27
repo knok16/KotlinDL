@@ -7,7 +7,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.activation.EPS
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.tensorflow.*
@@ -32,7 +32,7 @@ open class ActivationLayerTest {
             val numberOfLosses = tf.constant(1.0f)
 
             val output = layer.forward(tf, inputOp, isTraining, numberOfLosses)
-            val actualShape = shapeFromDims(*output.asOutput().tensor().shape())
+            val actualShape = shape(output.asOutput().tensor().shape())
             assertEquals(expectedShape, actualShape)
 
             assert2DArrayEquals(
@@ -71,7 +71,7 @@ open class ActivationLayerTest {
                 inputSize.toLong()
             )
 
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shape(output.shape())
             assertEquals(expectedShape, actualShape)
 
             output.copyTo(actual)

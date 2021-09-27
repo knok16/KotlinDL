@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.extension
 
-import org.jetbrains.kotlinx.dl.api.core.shape.numElementsInShape
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape2DTo1D
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape3DTo1D
 import org.jetbrains.kotlinx.dl.api.core.shape.reshape4DTo1D
@@ -27,10 +26,9 @@ public fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
             reshaped
         }
         2 -> {
-            val dst =
-                Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
+            val dst = Array(shape[0].toInt()) { FloatArray(shape[1].toInt()) }
             tensorForCopying.copyTo(dst)
-            reshaped = reshape2DTo1D(dst, numElementsInShape(shape).toInt())
+            reshaped = reshape2DTo1D(dst, numElements())
             reshaped
         }
         3 -> {
@@ -40,7 +38,7 @@ public fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
                 }
             }
             tensorForCopying.copyTo(dst)
-            reshaped = reshape3DTo1D(dst, numElementsInShape(shape).toInt())
+            reshaped = reshape3DTo1D(dst, numElements())
             reshaped
         }
         4 -> {
@@ -52,7 +50,7 @@ public fun Tensor<*>.convertTensorToFlattenFloatArray(): FloatArray {
                 }
             }
             tensorForCopying.copyTo(dst)
-            reshaped = reshape4DTo1D(dst, numElementsInShape(shape).toInt())
+            reshaped = reshape4DTo1D(dst, numElements())
             reshaped
         }
         else -> {

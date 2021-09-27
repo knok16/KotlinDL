@@ -171,10 +171,7 @@ fun main() {
             val floatArray = ImageConverter.toRawFloatArray(inputStream)
 
             val xTensorShape = it.inputLayer.input.asOutput().shape()
-            val tensorShape = longArrayOf(
-                1,
-                *tail(xTensorShape)
-            )
+            val tensorShape = longArrayOf(1, *xTensorShape.tail)
 
             val inputData = preprocessInput(floatArray, tensorShape, inputType = InputType.CAFFE)
             val res = it.predict(inputData, "Activation_predictions")

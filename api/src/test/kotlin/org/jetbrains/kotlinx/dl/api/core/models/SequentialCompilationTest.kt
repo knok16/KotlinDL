@@ -21,11 +21,12 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Accuracy
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.tensorflow.Shape
 
 private const val NUM_CHANNELS = 1L
 private const val IMAGE_SIZE = 28L
@@ -441,14 +442,14 @@ internal class SequentialModelTest {
             assertEquals(it.layers[6].paramCount, 1606144)
             assertEquals(it.layers[7].paramCount, 5130)
 
-            assertArrayEquals(it.layers[0].outputShape.dims(), longArrayOf(-1, 28, 28, 1))
-            assertArrayEquals(it.layers[1].outputShape.dims(), longArrayOf(-1, 28, 28, 32))
-            assertArrayEquals(it.layers[2].outputShape.dims(), longArrayOf(-1, 14, 14, 32))
-            assertArrayEquals(it.layers[3].outputShape.dims(), longArrayOf(-1, 14, 14, 64))
-            assertArrayEquals(it.layers[4].outputShape.dims(), longArrayOf(-1, 7, 7, 64))
-            assertArrayEquals(it.layers[5].outputShape.dims(), longArrayOf(-1, 3136))
-            assertArrayEquals(it.layers[6].outputShape.dims(), longArrayOf(-1, 512))
-            assertArrayEquals(it.layers[7].outputShape.dims(), longArrayOf(-1, 10))
+            assertArrayEquals(it.layers[0].outputShape.toLongArray(), longArrayOf(-1, 28, 28, 1))
+            assertArrayEquals(it.layers[1].outputShape.toLongArray(), longArrayOf(-1, 28, 28, 32))
+            assertArrayEquals(it.layers[2].outputShape.toLongArray(), longArrayOf(-1, 14, 14, 32))
+            assertArrayEquals(it.layers[3].outputShape.toLongArray(), longArrayOf(-1, 14, 14, 64))
+            assertArrayEquals(it.layers[4].outputShape.toLongArray(), longArrayOf(-1, 7, 7, 64))
+            assertArrayEquals(it.layers[5].outputShape.toLongArray(), longArrayOf(-1, 3136))
+            assertArrayEquals(it.layers[6].outputShape.toLongArray(), longArrayOf(-1, 512))
+            assertArrayEquals(it.layers[7].outputShape.toLongArray(), longArrayOf(-1, 10))
         }
     }
 
@@ -621,7 +622,7 @@ internal class SequentialModelTest {
                 )
             }
             assertEquals(
-                "The last dimensions (except first = -1) of shape of layer maxpool2d_14 contains zero or negative dimension values: [-1, 0, 0, 128].\n" +
+                "The last dimensions (except first = -1) of shape of layer maxpool2d_14 contains zero or negative dimension values: [?, 0, 0, 128].\n" +
                         "Analyze your model architecture and layer output shapes carefully to discover a problem.",
                 exception.message
             )

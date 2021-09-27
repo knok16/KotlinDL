@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlinx.dl.api.core.loss
 
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
@@ -23,7 +22,7 @@ internal class HuberTest {
 
             val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
 
-            val numberOfLosses = tf.constant(TensorShape(yTrue.asOutput().shape()).numElements().toFloat())
+            val numberOfLosses = tf.constant(yTrue.asOutput().tensor().numElements().toFloat())
 
             assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
 
@@ -49,7 +48,7 @@ internal class HuberTest {
             val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
             val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
-            val numberOfLosses = tf.constant(TensorShape(yPred.asOutput().shape()).numElements().toFloat())
+            val numberOfLosses = tf.constant(yPred.asOutput().tensor().numElements().toFloat())
 
             assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
 
@@ -75,7 +74,7 @@ internal class HuberTest {
             val yTrue: Operand<Float> = tf.reshape(tf.constant(yTrueArray), tf.constant(intArrayOf(2, 3)))
             val yPred: Operand<Float> = tf.reshape(tf.constant(yPredArray), tf.constant(intArrayOf(2, 3)))
 
-            val numberOfLosses = tf.constant(TensorShape(yPred.asOutput().shape()).numElements().toFloat())
+            val numberOfLosses = tf.constant(yPred.asOutput().tensor().numElements().toFloat())
 
             assertEquals(6f, numberOfLosses.asOutput().tensor().floatValue())
 

@@ -8,7 +8,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.initializer.Ones
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.ZeroPadding2D
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.inference.keras.CHANNELS_LAST
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -46,7 +46,7 @@ internal class ZeroPadding2DTest {
                 expectedOutputSize.toLong(),
                 NUM_CHANNELS.toLong()
             )
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shape(output.shape())
             assertEquals(expectedShape, actualShape)
 
             val actualArray = Array(BATCH_SIZE) {
@@ -103,7 +103,7 @@ internal class ZeroPadding2DTest {
                 expectedOutputWidth.toLong(),
                 NUM_CHANNELS.toLong()
             )
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shape(output.shape())
             assertEquals(expectedShape, actualShape)
 
             val actualArray = Array(BATCH_SIZE) {
@@ -162,7 +162,7 @@ internal class ZeroPadding2DTest {
                 expectedOutputWidth.toLong(),
                 NUM_CHANNELS.toLong()
             )
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shape(output.shape())
             assertEquals(expectedShape, actualShape)
 
             val actualArray = Array(BATCH_SIZE) {

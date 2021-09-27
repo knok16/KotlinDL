@@ -10,9 +10,9 @@ import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -101,7 +101,7 @@ public abstract class AbstractConv(
 
     override fun computeOutputShape(inputShape: Shape): Shape {
         val shape = defineOutputShape(inputShape)
-        outputShape = TensorShape(shape)
+        outputShape = shape
         return shape
     }
 
@@ -121,10 +121,10 @@ public abstract class AbstractConv(
     }
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
+    public val kernelShapeArray: LongArray get() = kernelShape.toLongArray()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
+    public val biasShapeArray: LongArray? get() = biasShape?.toLongArray()
 
     override var weights: Map<String, Array<*>>
         get() = extractConvWeights()
@@ -146,7 +146,7 @@ public abstract class AbstractConv(
      * @param numberOfChannels for input of this layer
      */
     protected open fun computeKernelShape(numberOfChannels: Long): Shape =
-        shapeFromDims(*kernelSizeInternal, numberOfChannels, filtersInternal)
+        shape(kernelSizeInternal + numberOfChannels + filtersInternal)
 
     /**
      * Define the [biasShape] by default from its [filtersInternal] and

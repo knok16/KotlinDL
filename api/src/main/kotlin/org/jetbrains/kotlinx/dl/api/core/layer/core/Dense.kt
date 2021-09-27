@@ -12,8 +12,9 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.regularizer.Regularizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.head
 import org.jetbrains.kotlinx.dl.api.core.shape.numElements
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.util.denseBiasVarName
 import org.jetbrains.kotlinx.dl.api.core.util.denseKernelVarName
 import org.jetbrains.kotlinx.dl.api.core.util.getDType
@@ -97,7 +98,7 @@ public class Dense(
     }
 
     override fun computeOutputShape(inputShape: Shape): Shape {
-        return TensorShape(inputShape).replaceLast(outputSize.toLong()).toShape()
+        return Shape.make(inputShape.head, outputSize.toLong())
     }
 
     override fun forward(
@@ -128,10 +129,10 @@ public class Dense(
         get() = (kernelShape.numElements() + (biasShape?.numElements() ?: 0)).toInt()
 
     /** Returns the shape of kernel weights. */
-    public val kernelShapeArray: LongArray get() = TensorShape(kernelShape).dims()
+    public val kernelShapeArray: LongArray get() = kernelShape.toLongArray()
 
     /** Returns the shape of bias weights. */
-    public val biasShapeArray: LongArray? get() = biasShape?.let { TensorShape(it) }?.dims()
+    public val biasShapeArray: LongArray? get() = biasShape?.toLongArray()
 
     override fun toString(): String {
         return "Dense(outputSize=$outputSize, activation=$activation, kernelInitializer=$kernelInitializer, biasInitializer=$biasInitializer, kernelShape=$kernelShape, biasShape=$biasShape)"

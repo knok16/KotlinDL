@@ -89,7 +89,7 @@ open class LayerTest {
             RunMode.GRAPH -> runLayerInGraphMode(layer, input)
         }
         output.use {
-            val outputShape = shapeFromDims(*output.shape())
+            val outputShape = shape(output.shape())
             val outputArray = getFloatArrayOfShape(outputShape).let {
                 when (outputShape.numDimensions()) {
                     1 -> it as Array<Float>
@@ -120,7 +120,7 @@ open class LayerTest {
         inputShapeArray: LongArray,
         expectedOutputShape: LongArray,
     ) {
-        val inputShape = shapeFromDims(*inputShapeArray)
+        val inputShape = shape(inputShapeArray)
         val outputShape = layer.computeOutputShape(inputShape).toLongArray()
         Assertions.assertArrayEquals(
             expectedOutputShape,

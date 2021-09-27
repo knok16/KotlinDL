@@ -6,7 +6,7 @@ package org.jetbrains.kotlinx.dl.api.core.layer.reshaping
 
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.tensorflow.Operand
 import org.tensorflow.Shape
@@ -39,7 +39,7 @@ public class Permute(
             val targetDim = inputShape.size(dim)
             outputShape[i + 1] = targetDim
         }
-        return shapeFromDims(*outputShape)
+        return shape(outputShape)
     }
 
     override fun forward(

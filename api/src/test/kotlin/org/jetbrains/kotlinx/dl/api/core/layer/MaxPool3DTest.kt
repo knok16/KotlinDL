@@ -3,14 +3,14 @@ package org.jetbrains.kotlinx.dl.api.core.layer
 import org.jetbrains.kotlinx.dl.api.core.KGraph
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool3D
 import org.jetbrains.kotlinx.dl.api.core.loss.EPS
-import org.jetbrains.kotlinx.dl.api.core.shape.shapeFromDims
+import org.jetbrains.kotlinx.dl.api.core.shape.shape
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.tensorflow.EagerSession
 import org.tensorflow.Graph
-import org.tensorflow.op.Ops
 import org.tensorflow.Shape
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.tensorflow.op.Ops
 
 internal class MaxPool3DTest {
 
@@ -87,7 +87,7 @@ internal class MaxPool3DTest {
                 expected[0][0][0][0].size.toLong(),
             )
 
-            val actualShape = shapeFromDims(*output.shape())
+            val actualShape = shape(output.shape())
             assertEquals(expectedShape, actualShape)
 
             val actual = Array(expected.size) {

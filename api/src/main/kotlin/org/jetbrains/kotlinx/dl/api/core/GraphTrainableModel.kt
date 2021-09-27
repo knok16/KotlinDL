@@ -22,8 +22,10 @@ import org.jetbrains.kotlinx.dl.api.core.metric.EvaluationResult
 import org.jetbrains.kotlinx.dl.api.core.metric.Metric
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Optimizer
-import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
+import org.jetbrains.kotlinx.dl.api.core.shape.get
+import org.jetbrains.kotlinx.dl.api.core.shape.numElements
 import org.jetbrains.kotlinx.dl.api.core.shape.tail
+import org.jetbrains.kotlinx.dl.api.core.shape.toLongArray
 import org.jetbrains.kotlinx.dl.api.core.summary.LayerSummary
 import org.jetbrains.kotlinx.dl.api.core.summary.ModelSummary
 import org.jetbrains.kotlinx.dl.api.core.util.*
@@ -159,7 +161,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         // should be after outputShape calculation
         numberOfClasses = when (layers.last()::class) {
             Dense::class -> (layers.last() as Dense).outputSize.toLong()
-            ActivationLayer::class -> (layers.last() as ActivationLayer).outputShape.tail()
+            ActivationLayer::class -> (layers.last() as ActivationLayer).outputShape.tail
                 .last()  // valid for mobileNet/DenseNet
             else -> 1
         }
@@ -329,12 +331,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
                     val (xBatchShape, yBatchShape) = calculateXYShapes(batch)
 
                     Tensor.create(
-                        xBatchShape,
+                        xBatchShape.toLongArray(),
                         serializeToBuffer(batch.x)
                     ).use { batchImagesTensor ->
-                        Tensor.create(yBatchShape, serializeLabelsToBuffer(batch.y, numberOfClasses))
+                        Tensor.create(yBatchShape.toLongArray(), serializeLabelsToBuffer(batch.y, numberOfClasses))
                             .use { batchLabelsTensor ->
-                                Tensor.create(TensorShape(yBatchShape).numElements().toFloat())
+                                Tensor.create(yBatchShape.numElements().toFloat())
                                     .use { numberOfLossesTensor ->
                                         Tensor.create(true).use { isTraining ->
                                             val (lossValue, metricValue) = trainOnBatch(
@@ -464,11 +466,11 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             val (imageShape, labelShape) = calculateXYShapes(batch)
 
             Tensor.create(
-                imageShape,
+                imageShape.toLongArray(),
                 serializeToBuffer(batch.x)
             ).use { testImagesTensor ->
-                Tensor.create(labelShape, serializeLabelsToBuffer(batch.y, numberOfClasses)).use { testLabelsTensor ->
-                    Tensor.create(TensorShape(labelShape).numElements().toFloat()).use { numberOfLossesTensor ->
+                Tensor.create(labelShape.toLongArray(), serializeLabelsToBuffer(batch.y, numberOfClasses)).use { testLabelsTensor ->
+                    Tensor.create(labelShape.numElements().toFloat()).use { numberOfLossesTensor ->
                         Tensor.create(false).use { isTraining ->
                             val lossAndMetricsTensors = session.runner()
                                 .fetch(metricOp)
@@ -531,7 +533,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             val batch: DataBatch = batchIter.next()
 
             Tensor.create(
-                imageShape,
+                imageShape.toLongArray(),
                 serializeToBuffer(batch.x)
             ).use { testImages ->
                 Tensor.create(false).use { isTraining ->
@@ -599,7 +601,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
             val batch: DataBatch = batchIter.next()
 
             Tensor.create(
-                imageShape,
+                imageShape.toLongArray(),
                 serializeToBuffer(batch.x)
             ).use { testImages ->
                 val predictionsTensor = session.runner()
@@ -643,7 +645,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         val imageShape = calculateXShape(1)
 
         Tensor.create(
-            imageShape,
+            imageShape.toLongArray(),
             FloatBuffer.wrap(inputData)
         ).use { testImages ->
             val tensors =
@@ -696,7 +698,7 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return runner.run()
     }
 
-    private fun calculateXYShapes(batch: DataBatch): Pair<LongArray, LongArray> {
+    private fun calculateXYShapes(batch: DataBatch): Pair<Shape, Shape> {
         val batchSize = batch.size
 
         val xBatchShape = calculateXShape(batchSize)
@@ -710,29 +712,20 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         return Pair(xBatchShape, yBatchShape)
     }
 
-    private fun calculateYShape(batchSize: Int) = longArrayOf(
-        batchSize.toLong(),
-        numberOfClasses
-    )
+    private fun calculateYShape(batchSize: Int): Shape = Shape.make(batchSize.toLong(), numberOfClasses)
 
     private fun batchValidation(
         batch: DataBatch,
-        xBatchShape: LongArray,
-        yBatchShape: LongArray
+        xBatchShape: Shape,
+        yBatchShape: Shape
     ) {
-        check(
-            TensorShape(xBatchShape).numElements().toInt() == batch.x.size * batch.x[0].size
-        )
-        {
-            "The calculated [from the Model] data batch shape ${xBatchShape.contentToString()} doesn't match actual data buffer size ${
+        check(xBatchShape.numElements().toInt() == batch.x.size * batch.x[0].size) {
+            "The calculated [from the Model] data batch shape $xBatchShape doesn't match actual data buffer size ${
                 batch.x.size * batch.x[0].size
             }. Please, check input data."
         }
-        check(
-            TensorShape(yBatchShape).numElements().toInt() == batch.y.size * numberOfClasses.toInt()
-        )
-        {
-            "The calculated [from the model] label batch shape ${yBatchShape.contentToString()} doesn't match actual data buffer size ${
+        check(yBatchShape.numElements().toInt() == batch.y.size * numberOfClasses.toInt()) {
+            "The calculated [from the model] label batch shape $yBatchShape doesn't match actual data buffer size ${
                 batch.y.size * numberOfClasses.toInt()
             }. " +
                     "\nPlease, check the input label data or correct number of classes [number of neurons] in last Dense layer, if you have a classification problem." +
@@ -740,15 +733,12 @@ public abstract class GraphTrainableModel(vararg layers: Layer) : TrainableModel
         }
     }
 
-    private fun calculateXShape(batchSize: Int): LongArray {
+    private fun calculateXShape(batchSize: Int): Shape {
         val inputLayer = layers.first() as Input
 
         val xTensorShape = inputLayer.input.asOutput().shape()
 
-        return longArrayOf(
-            batchSize.toLong(),
-            *tail(xTensorShape)
-        )
+        return Shape.make(batchSize.toLong(), *xTensorShape.tail)
     }
 
     /**
